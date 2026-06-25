@@ -2,8 +2,8 @@
 
 An interactive, browser-based magic circle designer. No installation, no dependencies, no internet required — open the file and start drawing.
 
-**[▶ Try it live](https://zoutbot-cpu.github.io/Magic-Circles/)**
-
+**[▶ Try it on a desktop](https://zoutbot-cpu.github.io/Magic-Circles/)**
+Or on **[▶ Mobile ](https://zoutbot-cpu.github.io/Magic-Circles/mobile.html)**
 ---
 
 ![Magic Circle Generator screenshot](Screenshot.png)
