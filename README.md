@@ -1,18 +1,21 @@
-# 🔮 Magic Circle Generator
+# 🔮 Magic Circle & Sigil Tools
 
-An interactive, browser-based magic circle designer. No installation, no dependencies, no internet required — open the file and start drawing.
+A suite of interactive, browser-based occult geometry tools. No installation, no dependencies, no internet required — open any file and start creating.
 
-**[▶ Try it on a desktop](https://zoutbot-cpu.github.io/Magic-Circles/)**
-Or on **[▶ Mobile ](https://zoutbot-cpu.github.io/Magic-Circles/mobile.html)**
----
-
-![Magic Circle Generator screenshot](Screenshot.png)
+**[▶ Magic Circle Generator](https://zoutbot-cpu.github.io/Magic-Circles/)**  
+**[📱 Mobile Version](https://zoutbot-cpu.github.io/Magic-Circles/magic_circle_mobile.html)**  
+**[✦ Sigil Creator](https://zoutbot-cpu.github.io/Magic-Circles/sigil_creator.html)**
 
 ---
 
-## Features
+## Tools
 
-### 17 Geometry Styles
+### 🔮 Magic Circle Generator — `index.html`
+
+Design and animate intricate magic circles with full control over geometry, colour, symbols, and text.
+
+**17 geometry styles**
+
 | Style | Description |
 |---|---|
 | Star polygon | Classic n-pointed star with nested rings |
@@ -33,120 +36,118 @@ Or on **[▶ Mobile ](https://zoutbot-cpu.github.io/Magic-Circles/mobile.html)**
 | Norse web | Vegvisir-style 8-stave rune compass |
 | Chaos star | 8-arrow chaos star with inner web |
 
-### Controls
-- **Points / symmetry** — 3 to 16 vertices
-- **Rings** — 1 to 8 concentric layers
-- **Detail** — 1 to 5 geometry density levels
-- **Scale, Line width, Glow, Opacity** — fine-tune the look
-- **Rotate** — manual rotation offset
-- **Animation speed** — controls live spin and export speed
-
-### Color & Theming
-- 12 stroke colour palettes (gold, silver, cyan, rose, emerald, purple, crimson, azure, amber, white, teal, lime)
-- Custom colour picker for stroke and background
-- 7 dark background presets
+**Features**
+- Points / symmetry (3–16), rings (1–8), detail levels (1–5)
+- Scale, line width, glow, opacity, rotation, animation speed
+- 12 colour palettes + custom colour picker, 7 dark backgrounds
 - Second colour for dual-layer mode
+- 5 center detail patterns per style (0–4)
+- Unicode symbol rings — 8 sets: Alchemical (64 glyphs), Astrological, Elder Futhark, Greek, Geometric, Occult, Latin, Arabic
+- 3 independent text rings with per-ring radius, size, spacing, offset, flip
+- Center inscription
+- Layer toggles: outer rings, inner rings, geometry, nodes, spokes, ticks, center core, symbols, text rings, particles
+- Inner geometry detail: cross lines, double ring, dashed ring, node rings, node size, tick multiplier, spoke skip
+- Modes: Dual layer, Mirror, Pulse, Sparks
+- 7 built-in presets + save/load your own
+- **Export:** PNG / SVG / GIF (looping) / MP4 — quality 240–720px, 30–120 frames
 
-### Symbol System
-Built entirely from Unicode — no fonts or internet needed:
-- 🜀 Alchemical symbols (64 glyphs, Unicode U+1F700 block)
-- ☉ Astrological glyphs (planets + zodiac)
-- ᚠ Elder Futhark runes (24 characters)
-- Α Greek alphabet
-- Geometric shapes, occult symbols, Latin, Arabic
-- Click to select, drag radius and size sliders to position
+---
 
-### Text Rings
-- 3 independent configurable text rings
-- Per-ring: text content, radius, font size, letter spacing, angular offset, flip direction
-- Rings counter-rotate during animation
-- Center inscription with Y-offset control
+### 📱 Mobile Version — `magic_circle_mobile.html`
 
-### Layers (toggle individually)
-Outer rings · Inner rings · Geometry · Nodes · Spokes · Tick marks · Center core · Symbols · Text rings · Particles
+Full-featured mobile interface optimised for phones and tablets.
 
-### Inner Geometry Detail
-- Cross lines, double ring, dashed ring, node rings toggles
-- Node size, tick multiplier, spoke skip sliders
-- **Center detail patterns** — 5 patterns per style (0–4), each progressively more complex
+- Canvas fills the screen edge-to-edge
+- Slide-up bottom sheet with 7 tabs: Adjust, Color, Symbols, Text, Layers, Presets, Export
+- iOS-style toggle switches
+- 3 floating action buttons: Pulse, Dual layer, Sparks
+- Add to home screen for full-screen app mode (iOS & Android)
 
-### Modes
-- **Dual layer** — ghost second circle offset by half a step
-- **Mirror** — reflected half at 35% opacity
-- **Pulse** — breathing scale oscillation
-- **Particles / Sparks** — glowing embers drift from the circle edge
+---
 
-### Presets
-7 built-in named presets · Save and name your own · Delete saved presets
+### ✦ Sigil Creator — `sigil_creator.html`
 
-### Export
+Turn words and intentions into unique magical sigils using classical occult methods.
+
+**How it works**
+1. Type a word or intention (e.g. `PROTECTION`, `I AM CREATIVE`)
+2. Choose a letter reduction method — remove duplicates, remove duplicates and vowels (traditional), or keep all
+3. The remaining letters are mapped onto a geometric grid
+4. Lines connect each letter in sequence — the path is your sigil
+
+**5 grid types**
+
+| Grid | Description |
+|---|---|
+| Rose Cross | Classic 3-column occult letter grid |
+| Number wheel | 9 numerological positions (A=1, B=2… J=1, S=1…) |
+| Letter circle | All 26 letters equally spaced around a ring |
+| 5×5 square | Polybius-style grid (I/J share a cell) |
+| Chaos scatter | Seeded pseudo-random placement |
+
+**Features**
+- 3 line styles: Angular, Bezier curves, Arc curves
+- Smoothness slider for curve intensity
+- 5 terminal styles: None, Dot, Circle, Diamond, Cross
+- Circle overlay — place any magic circle style behind the sigil at adjustable opacity
+- Trace animation — the sigil draws itself letter by letter
+- History panel — last 10 intentions, click to restore
+- Letter interpretation panel
+- **Export:** PNG (240–1080px) or animated GIF (sigil traces itself)
+
+---
+
+## Export formats
+
 | Format | Details |
 |---|---|
-| PNG | Current frame at selected quality (240 / 360 / 480 / 720 px) |
+| PNG | Static image at selected quality |
 | SVG | PNG embedded in SVG wrapper, opens in Inkscape / Illustrator |
-| GIF | Looping animation, 20fps, 30–120 frames, quality-selectable |
-| MP4 / WebM | Looping video at 30fps, 4–6 Mbps, WhatsApp-compatible |
+| GIF | Looping animation, 20fps, 30–120 frames, no CDN required |
+| MP4 / WebM | 30fps video loop, WhatsApp-compatible (Magic Circle only) |
 
-Export quality and frame count are controlled by the two dropdowns in the toolbar.
-
----
-
-## How to Use
-
-1. **Open `index.html`** in Chrome, Brave, Edge, or Firefox
-2. Pick a **style** from the dropdown
-3. Adjust **Points**, **Rings**, and **Detail** to taste
-4. Choose a **colour** from the left panel swatches or the custom picker
-5. Enable **Runes / Symbols** from the Symbols tab
-6. Type text into the **Text ring** fields in the right panel
-7. Hit **Play** to animate, then export with **Save GIF** or **Save MP4**
-
-> **Tip:** The **Random** button generates a surprise combination of style, symmetry, colour and rotation — great for inspiration.
+GIF encoding is fully self-contained — no external libraries, works offline and from `file://`.
 
 ---
 
-## Export Tips
+## How to use
 
-- **WhatsApp**: use **Save MP4** — WhatsApp converts GIFs to video anyway, so MP4 sends and plays better
-- **High quality PNG**: set Export quality to **Ultra (720px)** before clicking Save PNG
-- **Long GIF**: set GIF frames to **120** for a 6-second loop
-- **Browser viewer**: drag any exported GIF into Chrome/Edge to play it — Windows Photos only shows the first frame
+### Online
+Just open the links above — no installation needed.
 
----
-
-## Running Locally
-
-No setup required:
-
+### Locally
 ```bash
-# Option 1: just double-click index.html
+# Option 1: double-click any .html file
 
-# Option 2: serve with Python if you want a local URL
+# Option 2: serve with Python for a local URL
 python -m http.server 8080
 # then open http://localhost:8080
 ```
 
----
-
-## Deploying to GitHub Pages
-
-1. Fork or upload this repo to your GitHub account
-2. Rename the HTML file to `index.html` if it isn't already
-3. Go to **Settings → Pages**
-4. Source: **Deploy from a branch** → `main` → `/ (root)`
-5. Your live URL will appear within ~60 seconds:
-   `https://yourusername.github.io/magic-circle-generator/`
+### Add to your phone (iOS / Android)
+Open [`magic_circle_mobile.html`](https://zoutbot-cpu.github.io/Magic-Circles/magic_circle_mobile.html) in Safari or Chrome, tap Share → **Add to Home Screen**. It opens as a full-screen app with no browser chrome.
 
 ---
 
-## Technical Notes
+## Technical notes
 
-- **Pure vanilla HTML/CSS/JS** — zero frameworks, zero dependencies
-- **Self-contained** — the GIF encoder (LZW + NeuQuant palette quantiser) is written inline; no CDN calls
-- **Works offline** — after first page load, no network needed for anything
-- **file:// compatible** — opens directly from disk without a web server
-- Canvas size auto-fits to your browser window
-- GIF palette is sampled from 4 frames spread across the loop for accurate colour reproduction
+- Pure vanilla HTML / CSS / JavaScript — zero frameworks, zero dependencies
+- Fully self-contained — GIF encoder (LZW + NeuQuant palette quantiser) is written inline
+- Works offline after first load, and directly from disk (`file://`)
+- GIF palette sampled from 4 frames spread across the loop for accurate colour
+- Canvas auto-resizes to fill the browser window
+- All Unicode symbol sets are built into modern browsers — no font files needed
+
+---
+
+## Files
+
+| File | Description |
+|---|---|
+| `index.html` | Magic Circle Generator (desktop) |
+| `magic_circle_mobile.html` | Magic Circle Generator (mobile) |
+| `sigil_creator.html` | Sigil Creator |
+| `README.md` | This file |
 
 ---
 
