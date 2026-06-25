@@ -6,7 +6,7 @@ An interactive, browser-based magic circle designer. No installation, no depende
 
 ---
 
-![Magic Circle Generator screenshot](screenshot.png)
+![Magic Circle Generator screenshot](Screenshot.png)
 
 ---
 
