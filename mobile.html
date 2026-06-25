@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Magic Circle</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#ccc;font-family:sans-serif;touch-action:manipulation}
+#canvasWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+canvas{display:block;max-width:100vmin;max-height:100vmin}
+#topbar{position:fixed;top:0;left:0;right:0;height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid #1a1a1a}
+#styleSelect{flex:1;font-size:13px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:5px 8px;min-width:0}
+.topbtn{flex-shrink:0;font-size:12px;padding:5px 10px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;white-space:nowrap}
+.topbtn.on{background:#222;color:#fff;border-color:#555}
+#sheet{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #222;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);transform:translateY(calc(100% - 52px))}
+#sheet.open{transform:translateY(0)}
+#sheetHandle{height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+.pill{width:36px;height:4px;background:#333;border-radius:2px}
+#sheetContent{padding:0 12px 24px;max-height:62vh;overflow-y:auto;overflow-x:hidden}
+#tabStrip{display:flex;gap:4px;padding:8px 0;overflow-x:auto;scrollbar-width:none}
+#tabStrip::-webkit-scrollbar{display:none}
+.stab{flex-shrink:0;font-size:12px;padding:5px 12px;background:#111;color:#777;border:1px solid #222;border-radius:16px;cursor:pointer;white-space:nowrap}
+.stab.active{background:#1e1e1e;color:#ddd;border-color:#444}
+.pane{display:none}.pane.active{display:block}
+.sh{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1px;margin:12px 0 5px}
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.srow label{font-size:11px;color:#666;width:70px;flex-shrink:0}
+.srow input[type=range]{flex:1;min-width:0}
+.sv{font-size:11px;color:#aaa;width:30px;text-align:right;flex-shrink:0}
+.trow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #0e0e0e}
+.trow label{font-size:12px;color:#888}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.knob{position:absolute;inset:0;background:#222;border-radius:11px;transition:.2s}
+.knob:before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:#555;border-radius:50%;transition:.2s}
+.toggle input:checked+.knob{background:#2a2a2a}
+.toggle input:checked+.knob:before{transform:translateX(18px);background:#ccc}
+.cgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px}
+.csw{width:100%;aspect-ratio:1;border-radius:4px;cursor:pointer;border:2px solid transparent}
+.csw.sel{border-color:#fff}
+#mSymGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-height:150px;overflow-y:auto}
+.msym{font-size:18px;text-align:center;padding:3px;cursor:pointer;border-radius:3px;border:1px solid transparent;line-height:1.4}
+.msym.sel{background:#1a1a1a;border-color:#333}
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.ebtn{padding:10px;font-size:13px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:8px;cursor:pointer;text-align:center}
+.ebtn:active{background:#1a1a1a}
+.qrow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.qrow label{font-size:11px;color:#666;white-space:nowrap;width:72px;flex-shrink:0}
+.qrow select{flex:1;min-width:0;font-size:12px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:5px 6px}
+#mStatus{font-size:11px;color:#888;text-align:center;padding:6px 0;min-height:22px}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pbtn{font-size:11px;padding:8px 6px;background:#111;color:#888;border:1px solid #1a1a1a;border-radius:6px;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbtn:active{background:#1a1a1a;color:#ddd}
+#fabs{position:fixed;right:12px;bottom:64px;display:flex;flex-direction:column;gap:8px;z-index:99}
+.fab{width:46px;height:46px;border-radius:23px;background:rgba(18,18,18,0.92);border:1px solid #2a2a2a;color:#888;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
+.fab.on{background:rgba(40,40,40,0.95);color:#ddd;border-color:#555}
+input[type=text]{width:100%;font-size:12px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px;margin-bottom:6px}
+input[type=color]{width:100%;height:32px;background:#111;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;margin-bottom:8px}
+select{background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px}
+</style>
+</head>
+<body>
+<div id="canvasWrap"><canvas id="c"></canvas></div>
+
+<div id="topbar">
+  <select id="styleSelect">
+    <option value="star">Star polygon</option><option value="orbital">Orbital</option>
+    <option value="alchemic">Alchemic</option><option value="pentagram">Pentagram</option>
+    <option value="mandala">Mandala</option><option value="celtic">Celtic knot</option>
+    <option value="sigil">Sigil</option><option value="rose">Rose window</option>
+    <option value="enochian">Enochian</option><option value="sacred">Sacred geometry</option>
+    <option value="compass">Compass rose</option><option value="labyrinth">Labyrinth</option>
+    <option value="zodiac">Zodiac wheel</option><option value="fractal">Fractal rings</option>
+    <option value="gothic">Gothic arch</option><option value="norse">Norse web</option>
+    <option value="chaos">Chaos star</option>
+  </select>
+  <button class="topbtn" id="mAnimBtn">▶</button>
+  <button class="topbtn" id="mRandBtn">🎲</button>
+</div>
+
+<div id="fabs">
+  <div class="fab" id="fabPulse" title="Pulse">〇</div>
+  <div class="fab" id="fabDual" title="Dual">⊕</div>
+  <div class="fab" id="fabSparks" title="Sparks">✦</div>
+</div>
+
+<div id="sheet">
+  <div id="sheetHandle"><div class="pill"></div></div>
+  <div id="sheetContent">
+    <div id="tabStrip">
+      <div class="stab active" data-pane="sliders">Adjust</div>
+      <div class="stab" data-pane="color">Color</div>
+      <div class="stab" data-pane="symbols">Symbols</div>
+      <div class="stab" data-pane="text">Text</div>
+      <div class="stab" data-pane="layers">Layers</div>
+      <div class="stab" data-pane="presets">Presets</div>
+      <div class="stab" data-pane="export">Export</div>
+    </div>
+
+    <div class="pane active" id="pane-sliders">
+      <div class="srow"><label>Points</label><input type="range" id="mPts" min="3" max="16" value="6"><span class="sv" id="mvPts">6</span></div>
+      <div class="srow"><label>Rings</label><input type="range" id="mRings" min="1" max="8" value="3"><span class="sv" id="mvRings">3</span></div>
+      <div class="srow"><label>Detail</label><input type="range" id="mDetail" min="1" max="5" value="3"><span class="sv" id="mvDetail">3</span></div>
+      <div class="srow"><label>Center pat.</label><input type="range" id="mCenterPat" min="0" max="4" value="0"><span class="sv" id="mvCenterPat">0</span></div>
+      <div class="srow"><label>Scale</label><input type="range" id="mScale" min="40" max="130" value="100"><span class="sv" id="mvScale">100</span></div>
+      <div class="srow"><label>Line</label><input type="range" id="mLW" min="2" max="40" value="12"><span class="sv" id="mvLW">1.2</span></div>
+      <div class="srow"><label>Glow</label><input type="range" id="mGlow" min="0" max="50" value="16"><span class="sv" id="mvGlow">16</span></div>
+      <div class="srow"><label>Opacity</label><input type="range" id="mOpacity" min="10" max="100" value="100"><span class="sv" id="mvOpacity">100%</span></div>
+      <div class="srow"><label>Rotate</label><input type="range" id="mRot" min="0" max="360" value="0"><span class="sv" id="mvRot">0°</span></div>
+      <div class="srow"><label>Speed</label><input type="range" id="mSpeed" min="1" max="30" value="5"><span class="sv" id="mvSpeed">5</span></div>
+      <div class="sh">Detail</div>
+      <div class="trow"><label>Cross lines</label><label class="toggle"><input type="checkbox" id="mdCross" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Double ring</label><label class="toggle"><input type="checkbox" id="mdDouble" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Dashed ring</label><label class="toggle"><input type="checkbox" id="mdDash"><span class="knob"></span></label></div>
+      <div class="trow"><label>Node rings</label><label class="toggle"><input type="checkbox" id="mdNodeRings" checked><span class="knob"></span></label></div>
+      <div class="srow" style="margin-top:8px"><label>Node size</label><input type="range" id="mdNodeSz" min="2" max="20" value="6"><span class="sv" id="mvNodeSz">6</span></div>
+      <div class="srow"><label>Tick mult.</label><input type="range" id="mdTickMul" min="1" max="6" value="2"><span class="sv" id="mvTickMul">x2</span></div>
+      <div class="srow"><label>Spoke skip</label><input type="range" id="mdSpokeSkip" min="1" max="4" value="1"><span class="sv" id="mvSpokeSkip">1</span></div>
+    </div>
+
+    <div class="pane" id="pane-color">
+      <div class="sh">Stroke color</div>
+      <div class="cgrid" id="mSwColor"></div>
+      <input type="color" id="mCustomColor" value="#FFD700">
+      <div class="sh">Background</div>
+      <div class="cgrid" id="mSwBg"></div>
+      <input type="color" id="mCustomBg" value="#000000">
+      <div class="sh">Second color (dual)</div>
+      <div class="cgrid" id="mSwColor2"></div>
+    </div>
+
+    <div class="pane" id="pane-symbols">
+      <select id="mSymSet" style="width:100%;padding:6px;margin-bottom:8px">
+        <option value="alchemic">Alchemical</option><option value="astro">Astrological</option>
+        <option value="futhark">Elder Futhark</option><option value="greek">Greek</option>
+        <option value="geo">Geometric</option><option value="occult">Occult</option>
+        <option value="latin">Latin</option><option value="arabic">Arabic</option>
+      </select>
+      <div id="mSymGrid"></div>
+      <div class="sh">Selected</div>
+      <div id="mSelSyms" style="font-size:20px;min-height:32px;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:6px;letter-spacing:3px;margin-bottom:6px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="ebtn" style="flex:1" onclick="mClearSyms()">Clear</button>
+        <button class="ebtn" style="flex:1" onclick="mApplySyms()">Apply ↗</button>
+      </div>
+      <div class="srow"><label>Size</label><input type="range" id="mSymSize" min="8" max="40" value="16"><span class="sv" id="mvSymSize">16</span></div>
+      <div class="srow"><label>Radius</label><input type="range" id="mSymR" min="60" max="130" value="100"><span class="sv" id="mvSymR">100%</span></div>
+    </div>
+
+    <div class="pane" id="pane-text">
+      <div class="sh">Ring 1</div>
+      <input type="text" id="mtr1" value="🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇">
+      <div class="srow"><label>Radius</label><input type="range" id="mtr1R" min="50" max="140" value="108"><span class="sv" id="mvtr1R">108</span></div>
+      <div class="srow"><label>Size</label><input type="range" id="mtr1S" min="8" max="32" value="13"><span class="sv" id="mvtr1S">13</span></div>
+      <div class="srow"><label>Spacing</label><input type="range" id="mtr1Sp" min="1" max="40" value="14"><span class="sv" id="mvtr1Sp">14</span></div>
+      <div class="trow"><label>Flip</label><label class="toggle"><input type="checkbox" id="mtr1Flip"><span class="knob"></span></label></div>
+      <div class="sh">Ring 2</div>
+      <input type="text" id="mtr2" value="ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ">
+      <div class="srow"><label>Radius</label><input type="range" id="mtr2R" min="50" max="140" value="92"><span class="sv" id="mvtr2R">92</span></div>
+      <div class="srow"><label>Size</label><input type="range" id="mtr2S" min="8" max="32" value="11"><span class="sv" id="mvtr2S">11</span></div>
+      <div class="srow"><label>Spacing</label><input type="range" id="mtr2Sp" min="1" max="40" value="12"><span class="sv" id="mvtr2Sp">12</span></div>
+      <div class="trow"><label>Flip</label><label class="toggle"><input type="checkbox" id="mtr2Flip" checked><span class="knob"></span></label></div>
+      <div class="sh">Center inscription</div>
+      <input type="text" id="mtr3" placeholder="Center text…">
+      <div class="srow"><label>Size</label><input type="range" id="mtr3S" min="8" max="48" value="20"><span class="sv" id="mvtr3S">20</span></div>
+    </div>
+
+    <div class="pane" id="pane-layers">
+      <div class="trow"><label>Outer rings</label><label class="toggle"><input type="checkbox" id="mlOuter" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Inner rings</label><label class="toggle"><input type="checkbox" id="mlInner" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Geometry</label><label class="toggle"><input type="checkbox" id="mlGeom" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Nodes</label><label class="toggle"><input type="checkbox" id="mlNodes" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Spokes</label><label class="toggle"><input type="checkbox" id="mlSpokes" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Tick marks</label><label class="toggle"><input type="checkbox" id="mlTicks" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Center core</label><label class="toggle"><input type="checkbox" id="mlCenter" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Symbols</label><label class="toggle"><input type="checkbox" id="mlSymbols" checked><span class="knob"></span></label></div>
+      <div class="trow"><label>Text rings</label><label class="toggle"><input type="checkbox" id="mlTextRings" checked><span class="knob"></span></label></div>
+    </div>
+
+    <div class="pane" id="pane-presets">
+      <div class="sh">Built-in</div>
+      <div class="plist" id="mPresetList"></div>
+      <div class="sh" style="margin-top:10px">Save current</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="mPresetName" placeholder="Name…" style="margin-bottom:0">
+        <button class="ebtn" style="flex-shrink:0;padding:6px 12px" onclick="mSavePreset()">Save</button>
+      </div>
+      <div class="plist" id="mUserPresets" style="margin-top:8px"></div>
+    </div>
+
+    <div class="pane" id="pane-export">
+      <div class="qrow"><label>Quality</label><select id="meQuality"><option value="low">Low 240px</option><option value="med" selected>Med 360px</option><option value="high">High 480px</option><option value="ultra">Ultra 720px</option></select></div>
+      <div class="qrow"><label>GIF frames</label><select id="meFrames"><option value="30">30 (1.5s)</option><option value="60" selected>60 (3s)</option><option value="90">90 (4.5s)</option><option value="120">120 (6s)</option></select></div>
+      <div class="egrid">
+        <button class="ebtn" onclick="mExportPNG()">📷 PNG</button>
+        <button class="ebtn" onclick="mExportSVG()">⬡ SVG</button>
+        <button class="ebtn" onclick="mExportGIF()">🎞 GIF</button>
+        <button class="ebtn" onclick="mExportMP4()">🎬 MP4</button>
+      </div>
+      <div id="mStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Symbol & colour data ──
+const SYM_SETS={
+  alchemic:['🜀','🜁','🜂','🜃','🜄','🜅','🜆','🜇','🜈','🜉','🜊','🜋','🜌','🜍','🜎','🜏','🜐','🜑','🜒','🜓','🜔','🜕','🜖','🜗','🜘','🜙','🜚','🜛','🜜','🜝','🜞','🜟','🜠','🜡','🜢','🜣','🜤','🜥','🜦','🜧','🜨','🜩','🜪','🜫','🜬','🜭','🜮','🜯','🜰','🜱','🜲','🜳','🜴','🜵','🜶','🜷','🜸','🜹','🜺','🜻','🜼','🜽','🜾','🜿'],
+  astro:['☉','☽','☿','♀','♁','♂','♃','♄','♅','♆','♇','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','★','☆','✦','✧','⊕','⊗','⊙'],
+  futhark:['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'],
+  greek:['Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','α','β','γ','δ','ε','ζ','η','θ'],
+  geo:['◈','◇','◆','◎','⊛','⊜','⊝','⊞','⊟','⊠','⊡','▲','△','▽','▼','◁','▷','◯','⬡','⬢','⬣','✦','✧','✩','✪','✫','✬','✭','✮','✯','✰'],
+  occult:['☽','☾','⛤','⛧','✡','☸','☯','☩','☦','✝','♾','⚕','⚚','⚜','⚝','⚠','⚡','⚢','⚣','⚤','⚥','⚦','⚧','⚨','⚩','⛎','⚬','⚭','⚮'],
+  latin:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
+  arabic:['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'],
+};
+const COLS={gold:'#FFD700',silver:'#D0D0D0',cyan:'#00FFFF',rose:'#FF69B4',emerald:'#00FF88',purple:'#BB88FF',crimson:'#FF3333',azure:'#4488FF',amber:'#FFAA00',white:'#FFFFFF',teal:'#00CCBB',lime:'#AAFF00'};
+const GLOWS={gold:'#AA6600',silver:'#808080',cyan:'#006688',rose:'#880044',emerald:'#006622',purple:'#440088',crimson:'#660000',azure:'#001188',amber:'#884400',white:'#888888',teal:'#005544',lime:'#448800'};
+const BGS={'#000000':'Black','#070010':'Deep void','#000820':'Night sea','#100008':'Blood dark','#081000':'Forest','#0d0900':'Parchment','#1a1a2e':'Midnight'};
+
+// ── Canvas ──
+const CV=document.getElementById('c');
+const ctx=CV.getContext('2d',{willReadFrequently:true});
+function resize(){
+  const sz=Math.min(window.innerWidth,window.innerHeight);
+  CV.width=CV.height=sz;
+  if(!S.anim)render();
+}
+window.addEventListener('resize',resize);
+window.addEventListener('orientationchange',()=>setTimeout(resize,150));
+
+// ── State ──
+let S={
+  style:'star',pts:6,rings:3,detail:3,scale:100,lw:1.2,glow:16,opacity:1,rotate:0,speed:5,
+  color:'#FFD700',glow2:'#AA6600',color2:'#BB88FF',bg:'#000000',
+  anim:false,sparks:false,dual:false,pulse:false,mirror:false,
+  symSize:16,symR:100,symbols:[],
+  tr:[
+    {text:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',r:108,s:13,sp:14,off:0,flip:false},
+    {text:'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ',r:92,s:11,sp:12,off:20,flip:true},
+    {text:'',s:20,y:0}
+  ],
+  layers:{outer:true,inner:true,geom:true,nodes:true,spokes:true,ticks:true,center:true,symbols:true,textRings:true,sparks:true},
+  detail2:{cross:true,double:true,dash:false,starFill:false,nodeRings:true,nodeSz:6,tickMul:2,spokeSkip:1,centerPat:0}
+};
+let animId=null,animT=0,t=0,sparks=[];
+
+// ── Drawing engine (shared with desktop) ──
+const TAU=Math.PI*2;
+function W(){return CV.width}function H(){return CV.height}function cx(){return W()/2}function cy(){return H()/2}
+function baseR(){return Math.min(W(),H())*0.43*S.scale/100}
+
+function col(a=1){
+  const h=S.color;
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a*S.opacity})`;
+}
+function col2(a=1){
+  const h=S.color2;
+  const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a*S.opacity})`;
+}
+
+function ss(a=1,c=null){
+  ctx.strokeStyle=c||col(a);
+  ctx.shadowBlur=S.glow;
+  ctx.shadowColor=S.glow2;
+  ctx.lineWidth=S.lw;
+}
+function circ(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();}
+function miniCircs(r,n,sr,rot){for(let i=0;i<n;i++){const a=rot+i*TAU/n;circ(cx()+r*Math.cos(a),cy()+r*Math.sin(a),sr);}}
+function starPoly(r,n,skip,rot){
+  const pts=[];for(let i=0;i<n;i++)pts.push([cx()+r*Math.cos(rot+i*TAU/n),cy()+r*Math.sin(rot+i*TAU/n)]);
+  ctx.beginPath();for(let i=0;i<n;i++){const[x,y]=pts[(i*skip)%n];i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.stroke();
+}
+function tickMarks(r,n,len,rot){
+  const mul=S.detail2.tickMul;
+  const total=n*mul;
+  for(let i=0;i<total;i++){const a=rot+i*TAU/total;ctx.beginPath();ctx.moveTo(cx()+(r-len)*Math.cos(a),cy()+(r-len)*Math.sin(a));ctx.lineTo(cx()+(r+len)*Math.cos(a),cy()+(r+len)*Math.sin(a));ctx.stroke();}
+}
+function spokeDraw(r1,r2,n,rot){
+  if(!S.layers.spokes)return;
+  const sk=S.detail2.spokeSkip;
+  for(let i=0;i<n;i+=sk){const a=rot+i*TAU/n;ctx.beginPath();ctx.moveTo(cx()+r1*Math.cos(a),cy()+r1*Math.sin(a));ctx.lineTo(cx()+r2*Math.cos(a),cy()+r2*Math.sin(a));ctx.stroke();}
+}
+function polyN(r,rot,sides){
+  ctx.save();ctx.translate(cx(),cy());ctx.rotate(rot);
+  ctx.beginPath();for(let i=0;i<sides;i++){const a=i*TAU/sides-Math.PI/2;i===0?ctx.moveTo(r*Math.cos(a),r*Math.sin(a)):ctx.lineTo(r*Math.cos(a),r*Math.sin(a));}
+  ctx.closePath();ctx.stroke();ctx.restore();
+}
+
+// ── center detail patterns ──
+function drawCenter(R,r2,pat){
+  const D=S.detail2,L=S.layers;
+  if(!L.center)return;
+  const lw=S.lw;
+  // pat 0 = simple dot (original)
+  // pat 1–4 = progressively richer per-style (called with style context)
+  // This generic fallback is overridden per style below
+  ctx.lineWidth=lw*1.5;circ(cx(),cy(),R*0.07);ctx.lineWidth=lw;
+}
+
+// per-style center patterns: drawCenterFor(style, R, r2)
+function drawCenterFor(style,R,r2){
+  const D=S.detail2,L=S.layers;
+  if(!L.center)return;
+  const p=D.centerPat,lw=S.lw;
+  ctx.save();
+
+  if(style==='star'){
+    const skip=Math.max(2,Math.floor(S.pts/2));
+    if(p===0){ctx.lineWidth=lw*1.5;circ(cx(),cy(),R*0.07);ctx.lineWidth=lw;}
+    else if(p===1){circ(cx(),cy(),R*0.12);circ(cx(),cy(),R*0.06);}
+    else if(p===2){circ(cx(),cy(),R*0.14);starPoly(R*0.1,S.pts,skip,r2);}
+    else if(p===3){circ(cx(),cy(),R*0.18);circ(cx(),cy(),R*0.1);starPoly(R*0.14,S.pts,skip,r2+Math.PI/S.pts);miniCircs(R*0.1,S.pts,D.nodeSz*0.7,r2);}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.14);circ(cx(),cy(),R*0.07);starPoly(R*0.19,S.pts,skip,r2);starPoly(R*0.11,S.pts,skip,r2+Math.PI/S.pts);miniCircs(R*0.14,S.pts,D.nodeSz,r2);}
+  }
+  else if(style==='orbital'){
+    if(p===0){ctx.lineWidth=lw*2;circ(cx(),cy(),R*0.06);ctx.lineWidth=lw;}
+    else if(p===1){circ(cx(),cy(),R*0.1);circ(cx(),cy(),R*0.05);}
+    else if(p===2){circ(cx(),cy(),R*0.14);miniCircs(R*0.09,S.pts,D.nodeSz,r2);circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.17);circ(cx(),cy(),R*0.1);miniCircs(R*0.1,S.pts,D.nodeSz,r2);spokeDraw(R*0.01,R*0.07,S.pts,r2);circ(cx(),cy(),R*0.04);}
+    else{circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.13);miniCircs(R*0.13,S.pts,D.nodeSz,r2);miniCircs(R*0.07,S.pts,D.nodeSz*0.6,r2+Math.PI/S.pts);spokeDraw(R*0.01,R*0.1,S.pts*2,r2);circ(cx(),cy(),R*0.03);}
+  }
+  else if(style==='alchemic'){
+    if(p===0){circ(cx(),cy(),R*0.09);}
+    else if(p===1){circ(cx(),cy(),R*0.12);polyN(R*0.08,r2,3);}
+    else if(p===2){circ(cx(),cy(),R*0.15);polyN(R*0.1,r2,3);polyN(R*0.1,r2+Math.PI,3);}
+    else if(p===3){circ(cx(),cy(),R*0.18);polyN(R*0.13,r2,3);polyN(R*0.13,r2+Math.PI,3);circ(cx(),cy(),R*0.06);starPoly(R*0.09,6,2,r2);}
+    else{circ(cx(),cy(),R*0.22);polyN(R*0.16,r2,3);polyN(R*0.16,r2+Math.PI,3);polyN(R*0.1,r2+Math.PI/6,4);starPoly(R*0.12,6,2,r2);circ(cx(),cy(),R*0.05);}
+  }
+  else if(style==='pentagram'){
+    if(p===0){circ(cx(),cy(),R*0.09);}
+    else if(p===1){circ(cx(),cy(),R*0.13);const pp=[];for(let j=0;j<5;j++)pp.push([cx()+R*0.09*Math.cos(r2-Math.PI/2+j*TAU/5),cy()+R*0.09*Math.sin(r2-Math.PI/2+j*TAU/5)]);ctx.beginPath();[0,2,4,1,3,0].forEach((k,i)=>{i===0?ctx.moveTo(pp[k][0],pp[k][1]):ctx.lineTo(pp[k][0],pp[k][1]);});ctx.stroke();}
+    else if(p===2){circ(cx(),cy(),R*0.16);circ(cx(),cy(),R*0.09);miniCircs(R*0.12,5,D.nodeSz*0.8,r2-Math.PI/2);}
+    else if(p===3){circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.12);const pp2=[];for(let j=0;j<5;j++)pp2.push([cx()+R*0.16*Math.cos(r2-Math.PI/2+j*TAU/5),cy()+R*0.16*Math.sin(r2-Math.PI/2+j*TAU/5)]);ctx.beginPath();[0,2,4,1,3,0].forEach((k,i)=>{i===0?ctx.moveTo(pp2[k][0],pp2[k][1]):ctx.lineTo(pp2[k][0],pp2[k][1]);});ctx.stroke();miniCircs(R*0.12,5,D.nodeSz,r2-Math.PI/2);}
+    else{circ(cx(),cy(),R*0.24);circ(cx(),cy(),R*0.15);circ(cx(),cy(),R*0.07);const pp3=[];for(let j=0;j<5;j++)pp3.push([cx()+R*0.2*Math.cos(r2-Math.PI/2+j*TAU/5),cy()+R*0.2*Math.sin(r2-Math.PI/2+j*TAU/5)]);ctx.beginPath();[0,2,4,1,3,0].forEach((k,i)=>{i===0?ctx.moveTo(pp3[k][0],pp3[k][1]):ctx.lineTo(pp3[k][0],pp3[k][1]);});ctx.stroke();miniCircs(R*0.15,5,D.nodeSz,r2-Math.PI/2);spokeDraw(R*0.01,R*0.12,5,r2-Math.PI/2);}
+  }
+  else if(style==='mandala'){
+    if(p===0){ctx.lineWidth=lw*2;circ(cx(),cy(),R*0.04);ctx.lineWidth=lw;}
+    else if(p===1){circ(cx(),cy(),R*0.08);ctx.lineWidth=lw*2;circ(cx(),cy(),R*0.03);ctx.lineWidth=lw;}
+    else if(p===2){circ(cx(),cy(),R*0.12);circ(cx(),cy(),R*0.07);starPoly(R*0.05,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);circ(cx(),cy(),R*0.02);}
+    else if(p===3){circ(cx(),cy(),R*0.16);circ(cx(),cy(),R*0.1);miniCircs(R*0.07,S.pts,D.nodeSz*0.7,r2);starPoly(R*0.05,S.pts,Math.max(2,Math.floor(S.pts/2)),r2+Math.PI/S.pts);circ(cx(),cy(),R*0.02);}
+    else{circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.14);circ(cx(),cy(),R*0.08);miniCircs(R*0.11,S.pts,D.nodeSz*0.8,r2);miniCircs(R*0.06,S.pts,D.nodeSz*0.5,r2+Math.PI/S.pts);starPoly(R*0.1,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);circ(cx(),cy(),R*0.02);}
+  }
+  else if(style==='celtic'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){circ(cx(),cy(),R*0.12);circ(cx(),cy(),R*0.06);}
+    else if(p===2){circ(cx(),cy(),R*0.15);for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts;ctx.beginPath();ctx.moveTo(cx()+R*0.06*Math.cos(a),cy()+R*0.06*Math.sin(a));ctx.lineTo(cx()+R*0.13*Math.cos(a),cy()+R*0.13*Math.sin(a));ctx.stroke();}}
+    else if(p===3){circ(cx(),cy(),R*0.18);circ(cx(),cy(),R*0.1);miniCircs(R*0.1,S.pts,D.nodeSz,r2);for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts,b=r2+(i+1)*TAU/S.pts;ctx.beginPath();ctx.moveTo(cx()+R*0.05*Math.cos(a),cy()+R*0.05*Math.sin(a));ctx.quadraticCurveTo(cx(),cy(),cx()+R*0.05*Math.cos(b),cy()+R*0.05*Math.sin(b));ctx.stroke();}}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.14);circ(cx(),cy(),R*0.07);miniCircs(R*0.14,S.pts,D.nodeSz,r2);for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts,b=r2+(i+2)*TAU/S.pts;const x1=cx()+R*0.07*Math.cos(a),y1=cy()+R*0.07*Math.sin(a),x2=cx()+R*0.07*Math.cos(b),y2=cy()+R*0.07*Math.sin(b);ctx.beginPath();ctx.moveTo(x1,y1);ctx.quadraticCurveTo(cx()+(x1+x2)/2*0.3,cy()+(y1+y2)/2*0.3,x2,y2);ctx.stroke();}}
+  }
+  else if(style==='sigil'){
+    if(p===0){circ(cx(),cy(),R*0.06);}
+    else if(p===1){circ(cx(),cy(),R*0.1);circ(cx(),cy(),R*0.05);}
+    else if(p===2){circ(cx(),cy(),R*0.13);starPoly(R*0.09,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.17);circ(cx(),cy(),R*0.1);starPoly(R*0.13,S.pts,2,r2);miniCircs(R*0.07,Math.min(S.pts,8),D.nodeSz*0.7,r2+Math.PI/S.pts);circ(cx(),cy(),R*0.03);}
+    else{circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.13);circ(cx(),cy(),R*0.07);starPoly(R*0.16,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);starPoly(R*0.09,Math.max(3,Math.floor(S.pts/2)),2,r2+Math.PI/S.pts);miniCircs(R*0.1,Math.min(S.pts,8),D.nodeSz*0.7,r2);spokeDraw(R*0.01,R*0.06,S.pts,r2+Math.PI/S.pts);}
+  }
+  else if(style==='rose'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){circ(cx(),cy(),R*0.12);circ(cx(),cy(),R*0.06);}
+    else if(p===2){for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts,pr=R*0.07;circ(cx()+pr*Math.cos(a),cy()+pr*Math.sin(a),pr*0.6);}circ(cx(),cy(),R*0.05);}
+    else if(p===3){circ(cx(),cy(),R*0.16);for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts,pr=R*0.09;circ(cx()+pr*Math.cos(a),cy()+pr*Math.sin(a),pr*0.65);}circ(cx(),cy(),R*0.07);circ(cx(),cy(),R*0.03);}
+    else{circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.12);for(let i=0;i<S.pts;i++){const a=r2+i*TAU/S.pts,pr=R*0.1;circ(cx()+pr*Math.cos(a),cy()+pr*Math.sin(a),pr*0.7);}for(let i=0;i<S.pts;i++){const a=r2+Math.PI/S.pts+i*TAU/S.pts,pr=R*0.06;circ(cx()+pr*Math.cos(a),cy()+pr*Math.sin(a),pr*0.5);}circ(cx(),cy(),R*0.04);}
+  }
+  else if(style==='enochian'){
+    if(p===0){circ(cx(),cy(),R*0.07);}
+    else if(p===1){circ(cx(),cy(),R*0.12);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.05,-R*0.05,R*0.1,R*0.1);ctx.restore();}
+    else if(p===2){circ(cx(),cy(),R*0.15);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.08,-R*0.08,R*0.16,R*0.16);ctx.beginPath();ctx.moveTo(-R*0.08,0);ctx.lineTo(R*0.08,0);ctx.moveTo(0,-R*0.08);ctx.lineTo(0,R*0.08);ctx.stroke();ctx.restore();}
+    else if(p===3){circ(cx(),cy(),R*0.18);circ(cx(),cy(),R*0.1);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.07,-R*0.07,R*0.14,R*0.14);ctx.beginPath();ctx.moveTo(-R*0.1,0);ctx.lineTo(R*0.1,0);ctx.moveTo(0,-R*0.1);ctx.lineTo(0,R*0.1);ctx.stroke();ctx.restore();miniCircs(R*0.1,4,D.nodeSz,r2+Math.PI/4);}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.14);ctx.save();ctx.translate(cx(),cy());for(let a=0;a<4;a++){ctx.save();ctx.rotate(a*Math.PI/2);ctx.strokeRect(-R*0.08,-R*0.13,R*0.16,R*0.1);ctx.restore();}ctx.restore();starPoly(R*0.1,4,2,r2+Math.PI/4);miniCircs(R*0.14,4,D.nodeSz,r2);circ(cx(),cy(),R*0.04);}
+  }
+  else if(style==='sacred'||style==='compass'||style==='zodiac'){
+    // Circular styles — shared center patterns
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){circ(cx(),cy(),R*0.13);circ(cx(),cy(),R*0.06);}
+    else if(p===2){circ(cx(),cy(),R*0.17);starPoly(R*0.11,6,2,r2);circ(cx(),cy(),R*0.05);}
+    else if(p===3){circ(cx(),cy(),R*0.21);circ(cx(),cy(),R*0.13);starPoly(R*0.16,6,2,r2);miniCircs(R*0.09,6,D.nodeSz,r2);circ(cx(),cy(),R*0.04);}
+    else{circ(cx(),cy(),R*0.25);circ(cx(),cy(),R*0.17);circ(cx(),cy(),R*0.1);starPoly(R*0.21,6,2,r2);starPoly(R*0.13,6,2,r2+Math.PI/6);miniCircs(R*0.13,6,D.nodeSz,r2);circ(cx(),cy(),R*0.04);}
+  }
+  else if(style==='labyrinth'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.07,-R*0.07,R*0.14,R*0.14);ctx.restore();circ(cx(),cy(),R*0.05);}
+    else if(p===2){circ(cx(),cy(),R*0.13);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.08,-R*0.08,R*0.16,R*0.16);ctx.restore();circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.16);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.1,-R*0.1,R*0.2,R*0.2);ctx.strokeRect(-R*0.05,-R*0.05,R*0.1,R*0.1);ctx.restore();miniCircs(R*0.06,4,D.nodeSz*0.8,r2+Math.PI/4);}
+    else{circ(cx(),cy(),R*0.2);ctx.save();ctx.translate(cx(),cy());ctx.strokeRect(-R*0.13,-R*0.13,R*0.26,R*0.26);ctx.strokeRect(-R*0.07,-R*0.07,R*0.14,R*0.14);ctx.beginPath();ctx.moveTo(-R*0.07,0);ctx.lineTo(R*0.07,0);ctx.moveTo(0,-R*0.07);ctx.lineTo(0,R*0.07);ctx.stroke();ctx.restore();miniCircs(R*0.1,4,D.nodeSz,r2+Math.PI/4);circ(cx(),cy(),R*0.03);}
+  }
+  else if(style==='fractal'){
+    if(p===0){circ(cx(),cy(),R*0.07);}
+    else if(p===1){circ(cx(),cy(),R*0.11);circ(cx(),cy(),R*0.05);}
+    else if(p===2){circ(cx(),cy(),R*0.14);miniCircs(R*0.09,S.pts,D.nodeSz*0.7,r2);circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.18);circ(cx(),cy(),R*0.1);miniCircs(R*0.07,S.pts,D.nodeSz*0.7,r2+Math.PI/S.pts);starPoly(R*0.06,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.14);circ(cx(),cy(),R*0.08);miniCircs(R*0.11,S.pts,D.nodeSz*0.8,r2);miniCircs(R*0.06,S.pts,D.nodeSz*0.5,r2+Math.PI/S.pts);starPoly(R*0.1,S.pts,Math.max(2,Math.floor(S.pts/2)),r2);circ(cx(),cy(),R*0.03);}
+  }
+  else if(style==='gothic'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){for(let i=0;i<3;i++){const a=r2+i*TAU/3;circ(cx()+R*0.06*Math.cos(a),cy()+R*0.06*Math.sin(a),R*0.06);}circ(cx(),cy(),R*0.04);}
+    else if(p===2){circ(cx(),cy(),R*0.14);for(let i=0;i<3;i++){const a=r2+i*TAU/3;circ(cx()+R*0.08*Math.cos(a),cy()+R*0.08*Math.sin(a),R*0.07);}circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.18);for(let i=0;i<3;i++){const a=r2+i*TAU/3;circ(cx()+R*0.1*Math.cos(a),cy()+R*0.1*Math.sin(a),R*0.08);}for(let i=0;i<3;i++){const a=r2+Math.PI/3+i*TAU/3;circ(cx()+R*0.07*Math.cos(a),cy()+R*0.07*Math.sin(a),R*0.05);}circ(cx(),cy(),R*0.03);}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.12);for(let i=0;i<6;i++){const a=r2+i*TAU/6;circ(cx()+R*0.1*Math.cos(a),cy()+R*0.1*Math.sin(a),R*0.07);}for(let i=0;i<3;i++){const a=r2+i*TAU/3;circ(cx()+R*0.17*Math.cos(a),cy()+R*0.17*Math.sin(a),R*0.05);}circ(cx(),cy(),R*0.03);}
+  }
+  else if(style==='norse'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){circ(cx(),cy(),R*0.12);starPoly(R*0.08,8,3,r2);circ(cx(),cy(),R*0.04);}
+    else if(p===2){circ(cx(),cy(),R*0.16);circ(cx(),cy(),R*0.09);starPoly(R*0.12,8,3,r2);miniCircs(R*0.05,8,D.nodeSz*0.6,r2);}
+    else if(p===3){circ(cx(),cy(),R*0.2);circ(cx(),cy(),R*0.12);starPoly(R*0.16,8,3,r2);starPoly(R*0.09,8,3,r2+Math.PI/8);miniCircs(R*0.08,8,D.nodeSz*0.6,r2);}
+    else{circ(cx(),cy(),R*0.24);circ(cx(),cy(),R*0.16);circ(cx(),cy(),R*0.09);starPoly(R*0.2,8,3,r2);starPoly(R*0.12,8,3,r2+Math.PI/8);miniCircs(R*0.12,8,D.nodeSz*0.7,r2);spokeDraw(R*0.01,R*0.08,8,r2+Math.PI/16);}
+  }
+  else if(style==='chaos'){
+    if(p===0){circ(cx(),cy(),R*0.08);}
+    else if(p===1){starPoly(R*0.1,8,3,r2);circ(cx(),cy(),R*0.04);}
+    else if(p===2){circ(cx(),cy(),R*0.14);starPoly(R*0.1,8,3,r2);circ(cx(),cy(),R*0.04);}
+    else if(p===3){circ(cx(),cy(),R*0.18);circ(cx(),cy(),R*0.1);starPoly(R*0.14,8,3,r2);miniCircs(R*0.07,8,D.nodeSz*0.7,r2);circ(cx(),cy(),R*0.03);}
+    else{circ(cx(),cy(),R*0.22);circ(cx(),cy(),R*0.14);starPoly(R*0.18,8,3,r2);starPoly(R*0.1,8,3,r2+Math.PI/8);miniCircs(R*0.1,8,D.nodeSz*0.7,r2);spokeDraw(R*0.01,R*0.07,8,r2+Math.PI/16);circ(cx(),cy(),R*0.03);}
+  }
+  ctx.restore();
+}
+
+// ── draw styles ──
+function drawStyle(style,R,rot,er,alpha=1,useCol2=false){
+  const r2=rot+er;
+  const n=S.pts,d=S.detail,L=S.layers,D=S.detail2;
+  const c=useCol2?col2:col;
+  ss(alpha);if(useCol2)ctx.strokeStyle=c(alpha);
+
+  const setDash=(on)=>ctx.setLineDash(on?[4,4]:[]);
+
+  if(style==='star'){
+    const skip=Math.max(2,Math.floor(n/2));
+    for(let i=0;i<S.rings;i++){
+      const r=R*(1-i*0.16);
+      if(L.outer)circ(cx(),cy(),r);
+      if(D.double&&i===0){setDash(D.dash);ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),r*1.03);ctx.lineWidth=S.lw;setDash(false);}
+      if(L.geom)starPoly(r*0.87,n,skip,r2+i*0.1);
+      if(d>1&&L.nodes)miniCircs(r,n,D.nodeSz,r2);
+      if(d>2&&L.ticks)tickMarks(r,n,6,r2+Math.PI/n);
+    }
+    if(D.cross&&d>1)spokeDraw(R*0.05,R*0.5,n*2,r2+Math.PI/(n*2));
+    if(d>2&&L.nodes)miniCircs(R*0.3,n,D.nodeSz*1.2,r2);
+    if(d>3){if(L.inner)circ(cx(),cy(),R*0.2);if(L.geom)starPoly(R*0.18,n,skip,r2+Math.PI/n);}
+    drawCenterFor('star',R,r2);
+  }
+  else if(style==='orbital'){
+    if(L.outer)circ(cx(),cy(),R);
+    for(let i=0;i<S.rings;i++){
+      const r=R*(0.82-i*0.16);if(r<8)break;
+      if(L.inner)circ(cx(),cy(),r);
+      if(D.double){ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),r*1.04);ctx.lineWidth=S.lw;}
+      if(d>1&&L.nodes){const nr=D.nodeRings?r*0.09:D.nodeSz;miniCircs(r,n,nr,r2+i*0.25);}
+    }
+    if(d>2){spokeDraw(R*0.1,R*0.9,n,r2);if(L.nodes)miniCircs(R*0.9,n,D.nodeSz,r2);}
+    if(d>3&&L.nodes)miniCircs(R*0.48,n,D.nodeSz,r2+Math.PI/n);
+    drawCenterFor('orbital',R,r2);
+  }
+  else if(style==='alchemic'){
+    if(L.outer)circ(cx(),cy(),R);
+    if(S.rings>1){circ(cx(),cy(),R*0.77);if(D.double){ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),R*0.81);ctx.lineWidth=S.lw;}}
+    if(L.geom){polyN(R*0.67,r2,3);polyN(R*0.67,r2+Math.PI,3);polyN(R*0.44,r2+Math.PI/4,4);}
+    if(d>1){if(L.geom)polyN(R*0.55,r2,4);if(L.nodes)miniCircs(R,n,D.nodeSz,r2);}
+    if(d>2){if(L.inner)circ(cx(),cy(),R*0.3);if(L.geom)starPoly(R*0.27,6,2,r2);}
+    if(d>3&&L.nodes)miniCircs(R*0.77,n,D.nodeSz,r2);
+    drawCenterFor('alchemic',R,r2);
+    for(let i=0;i<S.rings-1;i++){ctx.lineWidth=S.lw*0.5;if(L.ticks)tickMarks(R*(0.87+i*0.055),n,8,r2);ctx.lineWidth=S.lw;}
+  }
+  else if(style==='pentagram'){
+    for(let i=0;i<S.rings;i++){
+      const r=R*(1-i*0.16);
+      if(L.outer)circ(cx(),cy(),r);
+      const pp=[];for(let j=0;j<5;j++)pp.push([cx()+r*0.87*Math.cos(r2-Math.PI/2+j*TAU/5),cy()+r*0.87*Math.sin(r2-Math.PI/2+j*TAU/5)]);
+      if(L.geom){ctx.beginPath();[0,2,4,1,3,0].forEach((k,idx)=>{idx===0?ctx.moveTo(pp[k][0],pp[k][1]):ctx.lineTo(pp[k][0],pp[k][1]);});ctx.stroke();}
+      if(d>1&&L.nodes)miniCircs(r,5,D.nodeSz,r2-Math.PI/2);
+    }
+    if(d>2){spokeDraw(R*0.2,R*0.57,5,r2-Math.PI/2);if(L.inner)circ(cx(),cy(),R*0.27);}
+    if(d>3){if(L.ticks)tickMarks(R*0.97,10,7,r2);if(L.nodes)miniCircs(R*0.54,5,D.nodeSz,r2+Math.PI/5);}
+    drawCenterFor('pentagram',R,r2);
+  }
+  else if(style==='mandala'){
+    for(let i=0;i<=S.rings;i++){
+      const r=R*(1-i*0.13);if(r<8)break;
+      circ(cx(),cy(),r);
+      if(D.double){ctx.lineWidth=S.lw*0.4;circ(cx(),cy(),r*1.03);ctx.lineWidth=S.lw;}
+      if(d>1&&i<S.rings&&L.ticks)tickMarks(r-R*0.065,n*2,5,r2+(i%2)*Math.PI/n);
+    }
+    spokeDraw(R*0.05,R*0.88,n,r2);
+    if(d>1&&L.nodes){for(let i=0;i<n;i++){const a=r2+i*TAU/n;circ(cx()+(R*0.42)*Math.cos(a),cy()+(R*0.42)*Math.sin(a),D.nodeSz*1.4);}}
+    if(d>2&&L.geom)starPoly(R*0.5,n,Math.max(2,Math.floor(n/2)),r2);
+    if(d>3&&L.nodes)miniCircs(R*0.75,n*2,D.nodeSz*0.7,r2+Math.PI/n);
+    drawCenterFor('mandala',R,r2);
+  }
+  else if(style==='celtic'){
+    if(L.outer)circ(cx(),cy(),R);
+    for(let i=0;i<n;i++){
+      const a=r2+i*TAU/n,b=r2+(i+2)*TAU/n;
+      const x1=cx()+R*0.74*Math.cos(a),y1=cy()+R*0.74*Math.sin(a);
+      const x2=cx()+R*0.74*Math.cos(b),y2=cy()+R*0.74*Math.sin(b);
+      if(L.geom){ctx.beginPath();ctx.moveTo(x1,y1);const mx=(x1+x2)/2+(y2-y1)*0.3,my=(y1+y2)/2-(x2-x1)*0.3;ctx.quadraticCurveTo(mx,my,x2,y2);ctx.stroke();}
+      if(L.nodes)circ(x1,y1,D.nodeSz);
+    }
+    for(let i=0;i<S.rings-1;i++){if(L.inner)circ(cx(),cy(),R*(0.52-i*0.14));}
+    if(d>2&&L.ticks)tickMarks(R*0.97,n*3,5,r2);
+    if(d>3&&L.geom)starPoly(R*0.44,n,Math.max(2,Math.floor(n/2)),r2);
+    drawCenterFor('celtic',R,r2);
+  }
+  else if(style==='sigil'){
+    if(L.outer)circ(cx(),cy(),R);
+    const verts=[];for(let i=0;i<n;i++){const a=r2+i*TAU/n;verts.push([cx()+R*0.79*Math.cos(a),cy()+R*0.79*Math.sin(a)]);}
+    if(L.geom){ctx.beginPath();ctx.moveTo(verts[0][0],verts[0][1]);for(let i=1;i<verts.length;i++)ctx.lineTo(verts[i][0],verts[i][1]);ctx.closePath();ctx.stroke();}
+    if(L.nodes)for(const[px,py]of verts)circ(px,py,D.nodeSz);
+    if(d>1){if(L.inner)circ(cx(),cy(),R*0.49);if(L.geom)starPoly(R*0.47,n,2,r2+Math.PI/n);}
+    if(d>2){spokeDraw(R*0.08,R*0.74,n,r2);if(L.ticks)tickMarks(R*0.96,n*4,5,r2);}
+    if(d>3){if(L.inner)circ(cx(),cy(),R*0.24);if(L.nodes)miniCircs(R*0.49,n,D.nodeSz*0.7,r2+Math.PI/(n*2));}
+    drawCenterFor('sigil',R,r2);
+  }
+  else if(style==='rose'){
+    if(L.outer)circ(cx(),cy(),R);
+    const petals=n;
+    for(let p=0;p<petals;p++){
+      const pa=r2+p*TAU/petals;
+      const pr=R*0.38,pcx=cx()+pr*Math.cos(pa),pcy=cy()+pr*Math.sin(pa);
+      if(L.geom){ctx.beginPath();ctx.arc(pcx,pcy,pr,0,TAU);ctx.stroke();}
+    }
+    for(let i=1;i<S.rings;i++)if(L.inner)circ(cx(),cy(),R*(1-i*0.25));
+    if(d>2)starPoly(R*0.35,petals,Math.max(2,Math.floor(petals/2)),r2);
+    if(d>3){miniCircs(R,petals,D.nodeSz,r2);spokeDraw(R*0.05,R*0.62,petals,r2+Math.PI/petals);}
+    drawCenterFor('rose',R,r2);
+  }
+  else if(style==='enochian'){
+    circ(cx(),cy(),R);
+    const tables=4,sq=R*0.55;
+    for(let i=0;i<tables;i++){
+      const a=r2+i*TAU/tables;
+      ctx.save();ctx.translate(cx()+R*0.45*Math.cos(a),cy()+R*0.45*Math.sin(a));ctx.rotate(a);
+      ctx.strokeRect(-sq*0.28,-sq*0.28,sq*0.56,sq*0.56);
+      if(d>2){ctx.beginPath();ctx.moveTo(-sq*0.28,0);ctx.lineTo(sq*0.28,0);ctx.moveTo(0,-sq*0.28);ctx.lineTo(0,sq*0.28);ctx.stroke();}
+      ctx.restore();
+    }
+    starPoly(R*0.52,tables*2,2,r2+Math.PI/tables);
+    circ(cx(),cy(),R*0.22);
+    if(d>1)spokeDraw(R*0.22,R*0.65,tables*2,r2);
+    if(d>3){miniCircs(R,n,D.nodeSz,r2);tickMarks(R*0.97,n*3,6,r2);}
+    drawCenterFor('enochian',R,r2);
+  }
+
+  else if(style==='sacred'){
+    // Flower of Life / Vesica Piscis geometry
+    if(L.outer)circ(cx(),cy(),R);
+    const cr=R*0.5; // cell radius
+    if(L.geom){
+      // central circle
+      circ(cx(),cy(),cr);
+      // 6 surrounding circles at cr distance
+      for(let i=0;i<6;i++){
+        const a=r2+i*TAU/6;
+        const ox=cx()+cr*Math.cos(a),oy=cy()+cr*Math.sin(a);
+        circ(ox,oy,cr);
+      }
+      if(d>1){
+        // second ring of 6
+        for(let i=0;i<6;i++){
+          const a=r2+Math.PI/6+i*TAU/6;
+          circ(cx()+cr*Math.sqrt(3)*Math.cos(a),cy()+cr*Math.sqrt(3)*Math.sin(a),cr);
+        }
+      }
+    }
+    for(let i=1;i<S.rings;i++)if(L.inner)circ(cx(),cy(),R*(1-i*0.22));
+    if(d>2&&L.ticks)tickMarks(R*0.97,6*D.tickMul,7,r2);
+    if(d>3&&L.nodes)miniCircs(R*0.5,6,D.nodeSz,r2);
+    drawCenterFor('sacred',R,r2);
+  }
+  else if(style==='compass'){
+    // Compass rose / navigation wheel
+    if(L.outer)circ(cx(),cy(),R);
+    if(D.double){ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),R*1.02);ctx.lineWidth=S.lw;}
+    const pts8=8,pts16=16;
+    // Cardinal & intercardinal points — long and short spokes
+    for(let i=0;i<pts16;i++){
+      const a=r2+i*TAU/pts16;
+      const long=i%2===0;
+      const r1=R*0.08,r2e=long?R*0.88:R*0.72;
+      if(L.spokes){ctx.beginPath();ctx.moveTo(cx()+r1*Math.cos(a),cy()+r1*Math.sin(a));ctx.lineTo(cx()+r2e*Math.cos(a),cy()+r2e*Math.sin(a));ctx.stroke();}
+      // Diamond arrowhead on cardinals
+      if(long&&L.geom){
+        const tip=R*0.94,w=R*0.04;
+        const nx=Math.cos(a),ny=Math.sin(a),px2=-ny,py2=nx;
+        ctx.beginPath();
+        ctx.moveTo(cx()+tip*nx,cy()+tip*ny);
+        ctx.lineTo(cx()+r2e*nx+w*px2,cy()+r2e*ny+w*py2);
+        ctx.lineTo(cx()+(r2e-R*0.06)*nx,cy()+(r2e-R*0.06)*ny);
+        ctx.lineTo(cx()+r2e*nx-w*px2,cy()+r2e*ny-w*py2);
+        ctx.closePath();ctx.stroke();
+      }
+    }
+    for(let i=1;i<S.rings;i++){const r=R*(0.65-i*0.15);if(r>8)circ(cx(),cy(),r);}
+    if(d>1&&L.ticks)tickMarks(R*0.97,32,4,r2+TAU/64);
+    if(d>2&&L.nodes)miniCircs(R*0.65,8,D.nodeSz,r2);
+    if(d>3&&L.geom)starPoly(R*0.62,8,3,r2+Math.PI/8);
+    drawCenterFor('compass',R,r2);
+  }
+  else if(style==='labyrinth'){
+    // Concentric square / rectangular labyrinth paths
+    if(L.outer)circ(cx(),cy(),R);
+    const steps=Math.min(S.rings+2,7);
+    for(let i=0;i<steps;i++){
+      const r=R*(1-i*0.13);if(r<10)break;
+      // alternating circle and rounded-square
+      if(i%2===0){
+        if(L.inner||i===0)circ(cx(),cy(),r);
+      } else {
+        if(L.geom){
+          ctx.save();ctx.translate(cx(),cy());ctx.rotate(r2);
+          const s=r*0.92;
+          ctx.beginPath();
+          // rounded square via arcs
+          const rad=r*0.15;
+          ctx.moveTo(-s+rad,-s);ctx.lineTo(s-rad,-s);ctx.arcTo(s,-s,s,-s+rad,rad);
+          ctx.lineTo(s,s-rad);ctx.arcTo(s,s,s-rad,s,rad);
+          ctx.lineTo(-s+rad,s);ctx.arcTo(-s,s,-s,s-rad,rad);
+          ctx.lineTo(-s,-s+rad);ctx.arcTo(-s,-s,-s+rad,-s,rad);
+          ctx.closePath();ctx.stroke();
+          ctx.restore();
+        }
+      }
+      // gaps / passages: short gap breaks drawn as ticks
+      if(d>1&&L.ticks)tickMarks(r,4,r*0.08,r2+i*Math.PI/4);
+    }
+    if(d>2&&L.spokes)spokeDraw(R*0.05,R*0.5,4,r2+Math.PI/4);
+    if(d>3&&L.nodes)miniCircs(R*0.5,4,D.nodeSz*1.2,r2);
+    drawCenterFor('labyrinth',R,r2);
+  }
+  else if(style==='zodiac'){
+    // 12-segment wheel with house dividers
+    if(L.outer)circ(cx(),cy(),R);
+    const seg=12;
+    for(let i=0;i<seg;i++){
+      const a=r2+i*TAU/seg;
+      // dividing spokes
+      if(L.spokes){
+        const sk=S.detail2.spokeSkip;
+        if(i%sk===0){ctx.beginPath();ctx.moveTo(cx()+R*0.35*Math.cos(a),cy()+R*0.35*Math.sin(a));ctx.lineTo(cx()+R*0.97*Math.cos(a),cy()+R*0.97*Math.sin(a));ctx.stroke();}
+      }
+      // Node at each house cusp on outer ring
+      if(L.nodes)circ(cx()+R*0.88*Math.cos(a+TAU/24),cy()+R*0.88*Math.sin(a+TAU/24),D.nodeSz);
+    }
+    // Ring structure
+    for(let i=0;i<S.rings;i++){
+      const r=R*(1-i*0.18);if(r<10)break;
+      if(L.inner||i===0)circ(cx(),cy(),r);
+    }
+    if(d>1&&L.ticks)tickMarks(R*0.97,seg*3,5,r2+TAU/72);
+    if(d>2&&L.geom){
+      // 4 element triangles (fire/water/earth/air)
+      polyN(R*0.32,r2,3);polyN(R*0.32,r2+Math.PI,3);
+    }
+    if(d>3&&L.nodes)miniCircs(R*0.35,seg,D.nodeSz*0.7,r2+TAU/24);
+    drawCenterFor('zodiac',R,r2);
+  }
+  else if(style==='fractal'){
+    // Recursive ring patterns — each ring spawns satellite circles
+    if(L.outer)circ(cx(),cy(),R);
+    const levels=Math.min(S.rings,5);
+    function fracRing(ox,oy,r,depth,rot3){
+      if(depth>levels||r<4)return;
+      if(L.inner||depth===0)circ(ox,oy,r);
+      if(depth<levels){
+        const childR=r*0.38,count=n;
+        for(let i=0;i<count;i++){
+          const a=rot3+i*TAU/count;
+          const cx2=ox+r*0.67*Math.cos(a),cy2=oy+r*0.67*Math.sin(a);
+          fracRing(cx2,cy2,childR,depth+1,rot3+Math.PI/count);
+        }
+      }
+    }
+    fracRing(cx(),cy(),R*0.7,0,r2);
+    if(d>1&&L.ticks)tickMarks(R*0.97,n*D.tickMul,5,r2);
+    if(d>2&&L.nodes)miniCircs(R,n,D.nodeSz,r2);
+    if(d>3&&L.geom)starPoly(R*0.68,n,Math.max(2,Math.floor(n/2)),r2);
+    drawCenterFor('fractal',R,r2);
+  }
+  else if(style==='gothic'){
+    // Gothic arch / cathedral window geometry
+    if(L.outer)circ(cx(),cy(),R);
+    const arches=n;
+    for(let i=0;i<arches;i++){
+      const a=r2+i*TAU/arches,b=r2+(i+1)*TAU/arches;
+      const x1=cx()+R*0.82*Math.cos(a),y1=cy()+R*0.82*Math.sin(a);
+      const x2=cx()+R*0.82*Math.cos(b),y2=cy()+R*0.82*Math.sin(b);
+      if(L.geom){
+        // pointed arch between adjacent points
+        const mx=(x1+x2)/2,my=(y1+y2)/2;
+        const dist=Math.hypot(x2-x1,y2-y1)*0.6;
+        const nx2=-(y2-y1)/Math.hypot(x2-x1,y2-y1),ny2=(x2-x1)/Math.hypot(x2-x1,y2-y1);
+        const peak=0.55;
+        ctx.beginPath();
+        ctx.moveTo(x1,y1);
+        ctx.quadraticCurveTo(mx+nx2*dist*peak,my+ny2*dist*peak,mx,my);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2,y2);
+        ctx.quadraticCurveTo(mx+nx2*dist*peak,my+ny2*dist*peak,mx,my);
+        ctx.stroke();
+      }
+      if(L.nodes)circ(x1,y1,D.nodeSz);
+    }
+    for(let i=1;i<S.rings;i++){const r=R*(1-i*0.2);if(r>8){if(L.inner)circ(cx(),cy(),r);}}
+    if(d>1&&L.ticks)tickMarks(R*0.97,arches*D.tickMul,6,r2+TAU/(arches*2));
+    if(d>2&&L.geom){
+      // trefoil: 3 overlapping circles
+      for(let i=0;i<3;i++){const a=r2+i*TAU/3;circ(cx()+R*0.18*Math.cos(a),cy()+R*0.18*Math.sin(a),R*0.18);}
+    }
+    if(d>3&&L.nodes)miniCircs(R*0.6,arches,D.nodeSz*0.7,r2+TAU/(arches*2));
+    drawCenterFor('gothic',R,r2);
+  }
+  else if(style==='norse'){
+    // Norse / Vegvisir — rune compass with 8 stave arms
+    if(L.outer)circ(cx(),cy(),R);
+    if(D.double){ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),R*1.03);ctx.lineWidth=S.lw;}
+    const arms=8;
+    for(let i=0;i<arms;i++){
+      const a=r2+i*TAU/arms;
+      const even=i%2===0;
+      if(L.spokes){
+        ctx.beginPath();ctx.moveTo(cx()+R*0.08*Math.cos(a),cy()+R*0.08*Math.sin(a));
+        ctx.lineTo(cx()+R*0.78*Math.cos(a),cy()+R*0.78*Math.sin(a));ctx.stroke();
+      }
+      if(L.geom){
+        // stave tip: forked or hooked
+        const tipR=R*0.78,forkLen=R*0.12,forkAngle=Math.PI/5;
+        if(even){
+          // forked tip
+          ctx.beginPath();ctx.moveTo(cx()+tipR*Math.cos(a),cy()+tipR*Math.sin(a));
+          ctx.lineTo(cx()+(tipR+forkLen)*Math.cos(a+forkAngle),cy()+(tipR+forkLen)*Math.sin(a+forkAngle));ctx.stroke();
+          ctx.beginPath();ctx.moveTo(cx()+tipR*Math.cos(a),cy()+tipR*Math.sin(a));
+          ctx.lineTo(cx()+(tipR+forkLen)*Math.cos(a-forkAngle),cy()+(tipR+forkLen)*Math.sin(a-forkAngle));ctx.stroke();
+          // crossbar
+          const cbR=R*0.5;
+          ctx.beginPath();ctx.moveTo(cx()+cbR*Math.cos(a)+forkLen*Math.cos(a+Math.PI/2),cy()+cbR*Math.sin(a)+forkLen*Math.sin(a+Math.PI/2));
+          ctx.lineTo(cx()+cbR*Math.cos(a)-forkLen*Math.cos(a+Math.PI/2),cy()+cbR*Math.sin(a)-forkLen*Math.sin(a+Math.PI/2));ctx.stroke();
+        } else {
+          // hooked tip
+          ctx.beginPath();ctx.moveTo(cx()+tipR*Math.cos(a),cy()+tipR*Math.sin(a));
+          ctx.lineTo(cx()+(tipR+forkLen)*Math.cos(a+forkAngle*1.5),cy()+(tipR+forkLen)*Math.sin(a+forkAngle*1.5));ctx.stroke();
+          // double crossbar
+          [0.35,0.6].forEach(frac=>{
+            const cbR2=R*frac;
+            ctx.beginPath();ctx.moveTo(cx()+cbR2*Math.cos(a)+R*0.07*Math.cos(a+Math.PI/2),cy()+cbR2*Math.sin(a)+R*0.07*Math.sin(a+Math.PI/2));
+            ctx.lineTo(cx()+cbR2*Math.cos(a)-R*0.07*Math.cos(a+Math.PI/2),cy()+cbR2*Math.sin(a)-R*0.07*Math.sin(a+Math.PI/2));ctx.stroke();
+          });
+        }
+      }
+    }
+    for(let i=0;i<S.rings-1;i++){const r=R*(0.85-i*0.2);if(r>8&&L.inner)circ(cx(),cy(),r);}
+    if(d>1&&L.ticks)tickMarks(R*0.97,arms*D.tickMul,5,r2+TAU/32);
+    if(d>2&&L.nodes)miniCircs(R*0.85,arms,D.nodeSz,r2);
+    if(d>3&&L.geom)starPoly(R*0.28,8,3,r2);
+    drawCenterFor('norse',R,r2);
+  }
+  else if(style==='chaos'){
+    // Chaos star — 8-pointed star with chaotic inner web
+    if(L.outer)circ(cx(),cy(),R);
+    if(D.double){ctx.lineWidth=S.lw*0.5;circ(cx(),cy(),R*1.03);ctx.lineWidth=S.lw;}
+    const arms=8;
+    // main 8 arrows
+    for(let i=0;i<arms;i++){
+      const a=r2+i*TAU/arms;
+      if(L.spokes){ctx.beginPath();ctx.moveTo(cx(),cy());ctx.lineTo(cx()+R*0.9*Math.cos(a),cy()+R*0.9*Math.sin(a));ctx.stroke();}
+      if(L.geom){
+        // arrowhead
+        const tipR=R*0.92,hw=R*0.05,hs=R*0.1;
+        const nx=Math.cos(a),ny=Math.sin(a),px2=-ny,py2=nx;
+        ctx.beginPath();
+        ctx.moveTo(cx()+tipR*nx,cy()+tipR*ny);
+        ctx.lineTo(cx()+(tipR-hs)*nx+hw*px2,cy()+(tipR-hs)*ny+hw*py2);
+        ctx.lineTo(cx()+(tipR-hs)*nx-hw*px2,cy()+(tipR-hs)*ny-hw*py2);
+        ctx.closePath();ctx.stroke();
+      }
+    }
+    for(let i=1;i<S.rings;i++){const r=R*(1-i*0.2);if(r>8&&L.inner)circ(cx(),cy(),r);}
+    // chaotic inner web: connect every arm to every other arm at mid-radius
+    if(d>1&&L.geom){
+      const webR=R*0.45;
+      const wpts=[];for(let i=0;i<arms;i++)wpts.push([cx()+webR*Math.cos(r2+i*TAU/arms),cy()+webR*Math.sin(r2+i*TAU/arms)]);
+      for(let i=0;i<arms;i++)for(let j=i+2;j<arms;j+=2){
+        ctx.beginPath();ctx.moveTo(wpts[i][0],wpts[i][1]);ctx.lineTo(wpts[j][0],wpts[j][1]);ctx.stroke();
+      }
+    }
+    if(d>2&&L.nodes)miniCircs(R*0.45,arms,D.nodeSz,r2);
+    if(d>3&&L.ticks)tickMarks(R*0.97,arms*D.tickMul,6,r2+TAU/32);
+    drawCenterFor('chaos',R,r2);
+  }
+}
+
+// ── curved text on ring ──
+function drawTextRing(text,radiusPct,fontSize,letterSpacing,offsetDeg,flip,animOffset){
+  if(!text.trim())return;
+  const chars=[...text];
+  const R=baseR()*radiusPct/100;
+  const r=R*(flip?-1:1);
+  const offsetRad=(offsetDeg*Math.PI/180)+animOffset;
+  ctx.save();
+  ctx.font=`${fontSize}px serif`;
+  ctx.fillStyle=col(0.8);
+  ctx.shadowBlur=S.glow*0.5;
+  ctx.shadowColor=S.glow2;
+  const arcLen=chars.length*letterSpacing;
+  const startAngle=offsetRad - (arcLen/(R))/2;
+  chars.forEach((ch,i)=>{
+    const angle=startAngle+(i*letterSpacing)/R;
+    ctx.save();
+    ctx.translate(cx()+R*Math.cos(angle),cy()+R*Math.sin(angle));
+    ctx.rotate(angle+(flip?-Math.PI/2:Math.PI/2));
+    ctx.fillText(ch,0,0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+// ── center text ──
+function drawCenterText(text,fontSize,yOff){
+  if(!text.trim())return;
+  ctx.save();
+  ctx.font=`${fontSize}px serif`;
+  ctx.fillStyle=col(0.9);
+  ctx.shadowBlur=S.glow;ctx.shadowColor=S.glow2;
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,cx(),cy()+yOff);
+  ctx.restore();
+}
+
+// ── symbols on ring ──
+function drawSymbols(extraRot){
+  if(!S.layers.symbols||!S.symbols.length)return;
+  const syms=S.symbols;
+  const R=baseR()*S.symR/100;
+  const rot=S.rotate*Math.PI/180+extraRot;
+  ctx.save();
+  ctx.font=`${S.symSize}px serif`;
+  ctx.fillStyle=col(0.85);
+  ctx.shadowBlur=S.glow;ctx.shadowColor=S.glow2;
+  syms.forEach((s,i)=>{
+    const a=rot+i*TAU/syms.length;
+    ctx.save();
+    ctx.translate(cx()+R*Math.cos(a),cy()+R*Math.sin(a));
+    ctx.rotate(a+Math.PI/2);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(s,0,0);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+// ── particles ──
+function updateSparks(){
+  if(!S.layers.sparks||!S.sparks)return;
+  for(const p of sparks){
+    ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,p.r*(p.life/p.maxLife),0,TAU);
+    ctx.fillStyle=col((p.life/p.maxLife)*0.7);
+    ctx.shadowBlur=8;ctx.shadowColor=S.glow2;
+    ctx.fill();ctx.restore();
+    p.x+=p.vx;p.y+=p.vy;p.vy+=0.025;p.vx*=0.99;p.life--;
+  }
+  for(let i=sparks.length-1;i>=0;i--)if(sparks[i].life<=0)sparks.splice(i,1);
+  if(sparks.length<100){
+    const a=Math.random()*TAU,R=baseR()*(0.4+Math.random()*0.65);
+    sparks.push({x:cx()+R*Math.cos(a),y:cy()+R*Math.sin(a),vx:(Math.random()-.5)*1.8,vy:(Math.random()-1.8)*1.5,r:Math.random()*3+.5,life:50+Math.random()*80,maxLife:130});
+  }
+}
+
+// ── main draw ──
+function draw(extraRot){
+  const cw=W(),ch=H();
+  ctx.clearRect(0,0,cw,ch);
+  ctx.fillStyle=S.bg;ctx.fillRect(0,0,cw,ch);
+  const R=baseR(),rot=S.rotate*Math.PI/180;
+  const tr=S.tr;
+
+  if(S.mirror){
+    ctx.save();ctx.scale(-1,1);ctx.translate(-cw,0);
+    ctx.globalAlpha=0.35;
+    drawStyle(S.style,R,rot,extraRot);
+    ctx.restore();ctx.globalAlpha=1;
+  }
+  if(S.dual){
+    ctx.globalAlpha=0.4;
+    drawStyle(S.style,R*0.82,rot+Math.PI/S.pts,-extraRot*1.2,0.6,true);
+    ctx.globalAlpha=1;
+  }
+
+  let drawR=R;
+  if(S.pulse){const ps=1+0.045*Math.sin(t*3);ctx.save();ctx.translate(cx(),cy());ctx.scale(ps,ps);ctx.translate(-cx(),-cy());drawR=R;}
+
+  drawStyle(S.style,drawR,rot,extraRot);
+  if(S.pulse)ctx.restore();
+
+  // text rings
+  if(S.layers.textRings){
+    const animO=extraRot*0.3;
+    drawTextRing(tr[0].text,tr[0].r,tr[0].s,tr[0].sp,tr[0].off,tr[0].flip,animO);
+    drawTextRing(tr[1].text,tr[1].r,tr[1].s,tr[1].sp,tr[1].off,tr[1].flip,-animO*1.3);
+    drawCenterText(tr[2].text,tr[2].s,tr[2].y);
+  }
+
+  drawSymbols(extraRot);
+  updateSparks();
+}
+
+
+
+function render(){draw(0);}
+function animate(){animId=requestAnimationFrame(animate);animT+=S.speed*0.001;t=animT;draw(animT);}
+function stopAnim(){cancelAnimationFrame(animId);animId=null;}
+
+// ── GIF encoder ──
+const GIFEncoder=(()=>{
+  // NeuQuant: neural-net palette quantiser (256 colours)
+  function NeuQuant(pixels,samplefac){
+    const N=256,intbias=1<<16,alphabiasshift=10,initalpha=1<<alphabiasshift;
+    const radbiasshift=8,radbias=1<<radbiasshift,alpharadbias=1<<(alphabiasshift+radbiasshift);
+    const initrad=N>>3,radiusbiasshift=6,radiusdec=30;
+    let net=[],freq=new Array(N).fill(intbias/N),bias=new Array(N).fill(0),radpower=[];
+    for(let i=0;i<N;i++)net[i]=[i*256/N,i*256/N,i*256/N];
+    function contest(b,g,r){
+      let bd=1<<28,bbd=bd,bp=0,bbp=0;
+      for(let i=0;i<N;i++){
+        const n=net[i],d=Math.abs(n[0]-b)+Math.abs(n[1]-g)+Math.abs(n[2]-r);
+        if(d<bd){bd=d;bp=i;}
+        const biasd=d-(bias[i]>>(16-4));if(biasd<bbd){bbd=biasd;bbp=i;}
+        freq[i]-=freq[i]>>3;bias[i]+=freq[i]<<4;
+      }
+      freq[bp]+=intbias/N|0;bias[bp]-=intbias<<(10-10);
+      return bbp;
+    }
+    function alter(alpha,i,b,g,r){net[i][0]-=alpha*(net[i][0]-b)/initalpha;net[i][1]-=alpha*(net[i][1]-g)/initalpha;net[i][2]-=alpha*(net[i][2]-r)/initalpha;}
+    function alterneigh(rad,i,b,g,r){
+      const lo=Math.max(i-rad,0),hi=Math.min(i+rad,N);
+      for(let j=i+1,k=i-1,m=1;j<hi||k>lo;m++){
+        const a=radpower[m]||0;
+        if(j<hi){net[j][0]-=a*(net[j][0]-b)/alpharadbias;net[j][1]-=a*(net[j][1]-g)/alpharadbias;net[j][2]-=a*(net[j][2]-r)/alpharadbias;j++;}
+        if(k>lo){net[k][0]-=a*(net[k][0]-b)/alpharadbias;net[k][1]-=a*(net[k][1]-g)/alpharadbias;net[k][2]-=a*(net[k][2]-r)/alpharadbias;k--;}
+      }
+    }
+    const len=pixels.length,sp=len/(4*samplefac)|0;
+    let delta=Math.max(sp/100|0,1),alpha=initalpha,radius=N*4;
+    let rad=radius>>6;if(rad<=1)rad=0;
+    for(let i=0;i<rad;i++)radpower[i]=alpha*(((rad*rad-i*i)*radbias)/(rad*rad))|0;
+    const step=len<8192?4:(len%4831?4*4831:(len%4649?4*4649:4*4783));
+    for(let i=0,pix=0;i<sp;i++){
+      const b=pixels[pix+2]&255,g=pixels[pix+1]&255,r=pixels[pix]&255;
+      const j=contest(b,g,r);alter(alpha,j,b,g,r);if(rad)alterneigh(rad,j,b,g,r);
+      pix+=step;if(pix>=len)pix-=len;
+      if(i%delta===0){alpha-=alpha/(30+(samplefac-1)/3|0);radius-=radius/radiusdec;rad=radius>>6;if(rad<=1)rad=0;for(let jj=0;jj<rad;jj++)radpower[jj]=alpha*(((rad*rad-jj*jj)*radbias)/(rad*rad))|0;}
+    }
+    // Build palette — net[i] is stored as [b,g,r] per NeuQuant convention
+    // Sort by green channel (net[i][1]) for perceptual ordering
+    const order=[...Array(N).keys()].sort((a,b)=>net[a][1]-net[b][1]);
+    const palette=new Uint8Array(N*3);
+    order.forEach((netIdx,palIdx)=>{
+      palette[palIdx*3+0]=net[netIdx][2]|0; // R
+      palette[palIdx*3+1]=net[netIdx][1]|0; // G
+      palette[palIdx*3+2]=net[netIdx][0]|0; // B
+    });
+    // map(r,g,b) -> nearest palette index
+    function map(r,g,b){let best=0,bestd=1e9;for(let i=0;i<N;i++){const dr=palette[i*3]-r,dg=palette[i*3+1]-g,db=palette[i*3+2]-b,d=dr*dr+dg*dg+db*db;if(d<bestd){bestd=d;best=i;}}return best;}
+    return{palette,map};
+  }
+
+  // GIF LZW encoder — correct implementation using sequence-keyed table
+  function lzwEncode(indices,minCS){
+    const clear=1<<minCS,eoi=clear+1;
+    let codeSize=minCS+1,maxCode=1<<codeSize;
+    const out=[];let buf=0,bufBits=0;
+    function emit(code){buf|=code<<bufBits;bufBits+=codeSize;while(bufBits>=8){out.push(buf&0xff);buf>>>=8;bufBits-=8;}}
+    // Table maps sequence string -> code.  Single pixels map "p" -> p.
+    let table={};
+    let nextCode=eoi+1;
+    function reset(){
+      table={};
+      for(let i=0;i<clear;i++)table[String(i)]=i;
+      emit(clear);
+      codeSize=minCS+1;maxCode=1<<codeSize;nextCode=eoi+1;
+    }
+    reset();
+    let seq=String(indices[0]);
+    for(let i=1;i<indices.length;i++){
+      const c=indices[i];
+      const ext=seq+','+c;
+      if(table[ext]!==undefined){
+        seq=ext;
+      } else {
+        emit(table[seq]);
+        if(nextCode<4096){
+          table[ext]=nextCode++;
+          if(nextCode>maxCode&&codeSize<12){codeSize++;maxCode<<=1;}
+        } else {
+          // Table full: emit clear and reset
+          emit(clear);
+          table={};for(let j=0;j<clear;j++)table[String(j)]=j;
+          nextCode=eoi+1;codeSize=minCS+1;maxCode=1<<codeSize;
+        }
+        seq=String(c);
+      }
+    }
+    emit(table[seq]);emit(eoi);
+    if(bufBits>0)out.push(buf&0xff);
+    return out;
+  }
+
+  function writeSubBlocks(arr,bytes){
+    for(let i=0;i<bytes.length;){const n=Math.min(255,bytes.length-i);arr.push(n);for(let j=0;j<n;j++)arr.push(bytes[i++]);}
+    arr.push(0);
+  }
+
+  // Encode frames: [{pixels:Uint8ClampedArray(w*h*4), delay:ms}]
+  function encode(frames,w,h){
+    const out=[];
+    const u16=v=>{out.push(v&0xff,(v>>8)&0xff);};
+    const str=s=>{for(let i=0;i<s.length;i++)out.push(s.charCodeAt(i)&0xff);};
+
+    // Build palette from a merged sample of several frames for colour accuracy
+    const sampleFrames=[frames[0],frames[Math.floor(frames.length/3)],frames[Math.floor(frames.length*2/3)],frames[frames.length-1]];
+    const merged=new Uint8Array(sampleFrames.reduce((s,f)=>s+f.pixels.length,0));
+    let moff=0;sampleFrames.forEach(f=>{merged.set(f.pixels,moff);moff+=f.pixels.length;});
+    const nq=NeuQuant(merged,10);
+    const pal=nq.palette;
+
+    // GIF89a header
+    str('GIF89a');u16(w);u16(h);
+    out.push(0xf7,0,0); // packed: GCT present, 8bpp; bg index 0; pixel aspect 0
+    for(let i=0;i<768;i++)out.push(pal[i]);
+
+    // Netscape looping extension (loops forever)
+    out.push(0x21,0xff,0x0b);str('NETSCAPE2.0');out.push(0x03,0x01,0x00,0x00,0x00);
+
+    for(const frame of frames){
+      const delay=Math.max(5,Math.round(frame.delay/10)); // centiseconds, min 2
+      // Graphic control extension
+      out.push(0x21,0xf9,0x04,0x00);u16(delay);out.push(0,0);
+      // Image descriptor
+      out.push(0x2c);u16(0);u16(0);u16(w);u16(h);out.push(0);
+      // Quantise pixels to palette indices
+      const px=frame.pixels,idx=new Uint8Array(w*h);
+      for(let i=0;i<w*h;i++){const j=i*4;idx[i]=nq.map(px[j],px[j+1],px[j+2]);}
+      // LZW compress and write
+      out.push(8);writeSubBlocks(out,lzwEncode(idx,8));
+    }
+    out.push(0x3b); // GIF trailer
+    return new Uint8Array(out);
+  }
+
+  return{encode};
+})();
+
+// ── GIF capture ──
+// ── MP4 export via MediaRecorder ──
+
+
+// ── Export helpers ──
+function mGetQualitySize(){return{low:240,med:360,high:480,ultra:720}[document.getElementById('meQuality').value]||360;}
+function mGetFrameCount(){return parseInt(document.getElementById('meFrames').value)||60;}
+function mRenderOffscreen(sz){const o=document.createElement('canvas');o.width=o.height=sz;o.getContext('2d').drawImage(CV,0,0,sz,sz);return o;}
+function mExportPNG(){const o=mRenderOffscreen(mGetQualitySize());const a=document.createElement('a');a.download='magic_circle.png';a.href=o.toDataURL('image/png');a.click();}
+function mExportSVG(){const sz=mGetQualitySize();const o=mRenderOffscreen(sz);const d=o.toDataURL('image/png');const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${sz}" height="${sz}"><rect width="${sz}" height="${sz}" fill="${S.bg}"/><image href="${d}" x="0" y="0" width="${sz}" height="${sz}"/></svg>`;const b=new Blob([svg],{type:'image/svg+xml'});const url=URL.createObjectURL(b);const a=document.createElement('a');a.download='magic_circle.svg';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+let mGifWorking=false;
+function mExportGIF(){
+  if(mGifWorking)return;mGifWorking=true;
+  const st=document.getElementById('mStatus');
+  const wasAnim=S.anim;
+  if(wasAnim){stopAnim();S.anim=false;document.getElementById('mAnimBtn').textContent='▶';document.getElementById('mAnimBtn').classList.remove('on');}
+  const FPS=20,FRAMES=mGetFrameCount(),DELAY=Math.round(1000/FPS),SZ=mGetQualitySize();
+  const off=document.createElement('canvas');off.width=off.height=SZ;
+  const oc=off.getContext('2d',{willReadFrequently:true});
+  const frames=[];let frame=0;
+  function cap(){
+    if(frame>=FRAMES){st.textContent='Encoding…';setTimeout(()=>{
+      try{const gif=GIFEncoder.encode(frames,SZ,SZ);const blob=new Blob([gif],{type:'image/gif'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download='magic_circle.gif';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);st.textContent='Saved!';setTimeout(()=>st.textContent='',3000);}
+      catch(e){st.textContent='Error: '+e.message;}
+      mGifWorking=false;
+      if(wasAnim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
+    },50);return;}
+    const angle=animT+(frame*(S.speed*0.001*(60/20)));
+    draw(angle);oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);
+    frames.push({pixels:oc.getImageData(0,0,SZ,SZ).data,delay:DELAY});
+    frame++;st.textContent='Frame '+frame+'/'+FRAMES;setTimeout(cap,0);
+  }
+  st.textContent='Starting…';setTimeout(cap,10);
+}
+function mExportMP4(){
+  const st=document.getElementById('mStatus');
+  if(!window.MediaRecorder){st.textContent='Not supported in this browser';return;}
+  const wasAnim=S.anim;
+  const FPS=30,FRAMES=mGetFrameCount(),SZ=mGetQualitySize();
+  const off=document.createElement('canvas');off.width=off.height=SZ;
+  const oc=off.getContext('2d');
+  const stream=off.captureStream(FPS);
+  const mime=MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')?'video/mp4;codecs=avc1':'video/webm;codecs=vp9';
+  const ext=mime.startsWith('video/mp4')?'mp4':'webm';
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});
+  const chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  rec.onstop=()=>{const blob=new Blob(chunks,{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download='magic_circle.'+ext;a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);st.textContent='Saved (.'+ext+')';setTimeout(()=>st.textContent='',4000);if(wasAnim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}};
+  if(wasAnim){stopAnim();S.anim=false;}
+  rec.start();
+  const angleStep=S.speed*0.001*(60/FPS);let capAngle=animT,frame=0;
+  function rf(){if(frame>=FRAMES){rec.stop();return;}draw(capAngle);oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);capAngle+=angleStep;frame++;st.textContent='Video '+frame+'/'+FRAMES;setTimeout(rf,16);}
+  rf();
+}
+
+// ── Sheet toggle ──
+document.getElementById('sheetHandle').addEventListener('click',()=>document.getElementById('sheet').classList.toggle('open'));
+
+// ── Tabs ──
+document.querySelectorAll('.stab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-'+tab.dataset.pane).classList.add('active');
+    document.getElementById('sheet').classList.add('open');
+  });
+});
+
+// ── Sliders ──
+function mSlider(id,setter,valId,fmt){
+  const el=document.getElementById(id);
+  el.addEventListener('input',()=>{const v=+el.value;setter(v);if(valId)document.getElementById(valId).textContent=fmt?fmt(v):v;if(!S.anim)render();});
+}
+mSlider('mPts',v=>S.pts=v,'mvPts');
+mSlider('mRings',v=>S.rings=v,'mvRings');
+mSlider('mDetail',v=>S.detail=v,'mvDetail');
+mSlider('mCenterPat',v=>S.detail2.centerPat=v,'mvCenterPat');
+mSlider('mScale',v=>S.scale=v,'mvScale');
+mSlider('mLW',v=>S.lw=v/10,'mvLW',v=>(v/10).toFixed(1));
+mSlider('mGlow',v=>S.glow=v,'mvGlow');
+mSlider('mOpacity',v=>S.opacity=v/100,'mvOpacity',v=>v+'%');
+mSlider('mRot',v=>S.rotate=v,'mvRot',v=>v+'°');
+mSlider('mSpeed',v=>S.speed=v,'mvSpeed');
+mSlider('mdNodeSz',v=>S.detail2.nodeSz=v,'mvNodeSz');
+mSlider('mdTickMul',v=>S.detail2.tickMul=v,'mvTickMul',v=>'x'+v);
+mSlider('mdSpokeSkip',v=>S.detail2.spokeSkip=v,'mvSpokeSkip');
+mSlider('mSymSize',v=>S.symSize=v,'mvSymSize');
+mSlider('mSymR',v=>S.symR=v,'mvSymR',v=>v+'%');
+mSlider('mtr1R',v=>S.tr[0].r=v,'mvtr1R');
+mSlider('mtr1S',v=>S.tr[0].s=v,'mvtr1S');
+mSlider('mtr1Sp',v=>S.tr[0].sp=v,'mvtr1Sp');
+mSlider('mtr2R',v=>S.tr[1].r=v,'mvtr2R');
+mSlider('mtr2S',v=>S.tr[1].s=v,'mvtr2S');
+mSlider('mtr2Sp',v=>S.tr[1].sp=v,'mvtr2Sp');
+mSlider('mtr3S',v=>S.tr[2].s=v,'mvtr3S');
+
+// ── Checkboxes ──
+[['mdCross','cross'],['mdDouble','double'],['mdDash','dash'],['mdNodeRings','nodeRings']].forEach(([id,key])=>{
+  document.getElementById(id).addEventListener('change',e=>{S.detail2[key]=e.target.checked;if(!S.anim)render();});
+});
+[['mlOuter','outer'],['mlInner','inner'],['mlGeom','geom'],['mlNodes','nodes'],['mlSpokes','spokes'],['mlTicks','ticks'],['mlCenter','center'],['mlSymbols','symbols'],['mlTextRings','textRings']].forEach(([id,key])=>{
+  document.getElementById(id).addEventListener('change',e=>{S.layers[key]=e.target.checked;if(!S.anim)render();});
+});
+
+// ── Text inputs ──
+[['mtr1',0],['mtr2',1],['mtr3',2]].forEach(([id,idx])=>{
+  document.getElementById(id).addEventListener('input',e=>{S.tr[idx].text=e.target.value;if(!S.anim)render();});
+});
+[['mtr1Flip',0],['mtr2Flip',1]].forEach(([id,idx])=>{
+  document.getElementById(id).addEventListener('change',e=>{S.tr[idx].flip=e.target.checked;if(!S.anim)render();});
+});
+
+// ── Style select ──
+document.getElementById('styleSelect').addEventListener('change',e=>{S.style=e.target.value;if(!S.anim)render();});
+
+// ── Anim & Random ──
+document.getElementById('mAnimBtn').addEventListener('click',()=>{
+  S.anim=!S.anim;const btn=document.getElementById('mAnimBtn');
+  btn.textContent=S.anim?'⏹':'▶';btn.classList.toggle('on',S.anim);
+  if(S.anim)animate();else{stopAnim();render();}
+});
+document.getElementById('mRandBtn').addEventListener('click',()=>{
+  const styles=['star','orbital','alchemic','pentagram','mandala','celtic','sigil','rose','enochian','sacred','compass','labyrinth','zodiac','fractal','gothic','norse','chaos'];
+  const colKeys=Object.keys(COLS);
+  S.style=styles[Math.floor(Math.random()*styles.length)];
+  S.pts=3+Math.floor(Math.random()*14);S.rings=1+Math.floor(Math.random()*7);S.detail=1+Math.floor(Math.random()*5);
+  const ck=colKeys[Math.floor(Math.random()*colKeys.length)];S.color=COLS[ck];S.glow2=GLOWS[ck];S.rotate=Math.floor(Math.random()*360);
+  document.getElementById('styleSelect').value=S.style;
+  document.getElementById('mPts').value=S.pts;document.getElementById('mvPts').textContent=S.pts;
+  document.getElementById('mRings').value=S.rings;document.getElementById('mvRings').textContent=S.rings;
+  document.getElementById('mDetail').value=S.detail;document.getElementById('mvDetail').textContent=S.detail;
+  document.getElementById('mRot').value=S.rotate;document.getElementById('mvRot').textContent=S.rotate+'°';
+  document.querySelectorAll('#mSwColor .csw').forEach(x=>x.classList.remove('sel'));
+  document.querySelector('#mSwColor .csw[data-ck="'+ck+'"]')?.classList.add('sel');
+  if(!S.anim)render();
+});
+
+// ── FABs ──
+document.getElementById('fabPulse').addEventListener('click',()=>{
+  S.pulse=!S.pulse;document.getElementById('fabPulse').classList.toggle('on',S.pulse);
+  if(S.pulse&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
+  else if(!S.anim)render();
+});
+document.getElementById('fabDual').addEventListener('click',()=>{S.dual=!S.dual;document.getElementById('fabDual').classList.toggle('on',S.dual);if(!S.anim)render();});
+document.getElementById('fabSparks').addEventListener('click',()=>{
+  S.sparks=!S.sparks;document.getElementById('fabSparks').classList.toggle('on',S.sparks);
+  if(S.sparks&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
+  if(!S.sparks)sparks=[];
+});
+
+// ── Color swatches ──
+function buildCSwatch(containerId,colMap,onClick){
+  const c=document.getElementById(containerId);
+  Object.entries(colMap).forEach(([k,hex])=>{
+    const s=document.createElement('div');s.className='csw';s.style.background=hex;s.dataset.ck=k;s.title=k;
+    s.addEventListener('click',()=>{c.querySelectorAll('.csw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');onClick(k,hex);});
+    c.appendChild(s);
+  });
+}
+buildCSwatch('mSwColor',COLS,(k,hex)=>{S.color=hex;S.glow2=GLOWS[k];if(!S.anim)render();});
+document.querySelector('#mSwColor .csw').classList.add('sel');
+buildCSwatch('mSwBg',BGS,(k,hex)=>{S.bg=hex;document.getElementById('mCustomBg').value=hex;if(!S.anim)render();});
+document.querySelector('#mSwBg .csw').classList.add('sel');
+buildCSwatch('mSwColor2',COLS,(k,hex)=>{S.color2=hex;if(!S.anim)render();});
+document.getElementById('mCustomColor').addEventListener('input',e=>{S.color=e.target.value;S.glow2=e.target.value+'88';document.querySelectorAll('#mSwColor .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
+document.getElementById('mCustomBg').addEventListener('input',e=>{S.bg=e.target.value;document.querySelectorAll('#mSwBg .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
+
+// ── Symbol picker ──
+let mSelSyms=[];
+function mBuildSymGrid(setKey){
+  const g=document.getElementById('mSymGrid');g.innerHTML='';
+  (SYM_SETS[setKey]||[]).forEach(s=>{
+    const d=document.createElement('div');d.className='msym';d.textContent=s;
+    d.addEventListener('click',()=>{if(mSelSyms.includes(s)){mSelSyms=mSelSyms.filter(x=>x!==s);d.classList.remove('sel');}else{mSelSyms.push(s);d.classList.add('sel');}document.getElementById('mSelSyms').textContent=mSelSyms.join('');});
+    g.appendChild(d);
+  });
+}
+document.getElementById('mSymSet').addEventListener('change',e=>mBuildSymGrid(e.target.value));
+mBuildSymGrid('alchemic');
+function mClearSyms(){mSelSyms=[];document.getElementById('mSelSyms').textContent='';document.querySelectorAll('.msym').forEach(x=>x.classList.remove('sel'));}
+function mApplySyms(){S.symbols=[...mSelSyms];if(!S.anim)render();}
+
+// ── Presets ──
+const PRESETS=[
+  {name:'Summoning seal',style:'alchemic',pts:6,rings:3,detail:4,color:'crimson',bg:'#000000',dual:true,tr0:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',tr1:'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ',tr2:''},
+  {name:'Celestial orbit',style:'orbital',pts:8,rings:4,detail:4,color:'cyan',bg:'#000820',tr0:'☉ ☽ ☿ ♀ ♁ ♂ ♃ ♄ ♅ ♆',tr1:'♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓',tr2:''},
+  {name:'Elder sigil',style:'sigil',pts:9,rings:2,detail:5,color:'purple',bg:'#0a0010',tr0:'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ',tr1:'',tr2:''},
+  {name:'Golden mandala',style:'mandala',pts:8,rings:5,detail:4,color:'gold',bg:'#000000',tr0:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇 🜈 🜉 🜊 🜋',tr1:'Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ',tr2:''},
+  {name:'Celtic ward',style:'celtic',pts:7,rings:3,detail:4,color:'emerald',bg:'#081000',tr0:'',tr1:'',tr2:''},
+  {name:'Rose window',style:'rose',pts:12,rings:3,detail:4,color:'azure',bg:'#000820',tr0:'☆ ✦ ★ ✧ ☆ ✦ ★ ✧ ☆ ✦ ★ ✧',tr1:'',tr2:''},
+  {name:'Enochian gate',style:'enochian',pts:8,rings:4,detail:5,color:'amber',bg:'#100008',dual:true,tr0:'Α Β Γ Δ Ε Ζ Η Θ',tr1:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',tr2:'VERITAS'},
+  {name:'Star of chaos',style:'star',pts:8,rings:4,detail:5,color:'amber',bg:'#100008',dual:true,tr0:'',tr1:'',tr2:''},
+];
+function mApplyPreset(p){
+  const ck=p.color;
+  Object.assign(S,{style:p.style,pts:p.pts,rings:p.rings,detail:p.detail,
+    color:COLS[ck]||COLS.gold,glow2:GLOWS[ck]||GLOWS.gold,bg:p.bg,dual:!!p.dual});
+  if(p.tr0!==undefined)S.tr[0].text=p.tr0;
+  if(p.tr1!==undefined)S.tr[1].text=p.tr1;
+  if(p.tr2!==undefined)S.tr[2].text=p.tr2;
+  document.getElementById('styleSelect').value=S.style;
+  document.getElementById('mPts').value=S.pts;document.getElementById('mvPts').textContent=S.pts;
+  document.getElementById('mRings').value=S.rings;document.getElementById('mvRings').textContent=S.rings;
+  document.getElementById('mDetail').value=S.detail;document.getElementById('mvDetail').textContent=S.detail;
+  document.getElementById('fabDual').classList.toggle('on',S.dual);
+  document.getElementById('mtr1').value=S.tr[0].text;
+  document.getElementById('mtr2').value=S.tr[1].text;
+  document.getElementById('mtr3').value=S.tr[2].text;
+  if(!S.anim)render();
+}
+const mpl=document.getElementById('mPresetList');
+PRESETS.forEach(p=>{
+  const b=document.createElement('button');b.className='pbtn';b.textContent=p.name;
+  b.addEventListener('click',()=>mApplyPreset(p));mpl.appendChild(b);
+});
+let mUserPresets=[];
+function mSavePreset(){
+  const name=document.getElementById('mPresetName').value.trim();if(!name)return;
+  const snap=JSON.parse(JSON.stringify(S));snap.name=name;mUserPresets.push(snap);mRenderUserPresets();document.getElementById('mPresetName').value='';
+}
+function mRenderUserPresets(){
+  const c=document.getElementById('mUserPresets');c.innerHTML='';
+  mUserPresets.forEach(p=>{const b=document.createElement('button');b.className='pbtn';b.textContent=p.name;b.addEventListener('click',()=>{Object.assign(S,JSON.parse(JSON.stringify(p)));if(!S.anim)render();});c.appendChild(b);});
+}
+
+// ── Init ──
+resize();
+render();
+</script>
+</body>
+</html>
