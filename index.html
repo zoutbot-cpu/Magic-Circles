@@ -52,6 +52,7 @@ canvas{display:block}
 .textrow label{font-size:10px;color:#666;width:46px;flex-shrink:0;white-space:nowrap}
 .textrow input,.textrow select{flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px}
 /* scrollbar */
+.speed-sel{font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px;max-width:80px}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#080808}::-webkit-scrollbar-thumb{background:#222;border-radius:2px}
 /* tab strip */
 .tabs{display:flex;gap:2px;margin-bottom:6px;flex-wrap:wrap}
@@ -110,17 +111,24 @@ canvas{display:block}
         <option value="ultra">Ultra (720px)</option>
       </select>
     </div>
-    <div class="ctrl" style="min-width:55px">
-      <label>GIF frames</label>
-      <select id="eFrames">
-        <option value="30">30 (1.5s)</option>
-        <option value="60" selected>60 (3s)</option>
-        <option value="90">90 (4.5s)</option>
-        <option value="120">120 (6s)</option>
+    <div class="ctrl" style="min-width:100px">
+      <label>Loop sync on</label>
+      <select id="loopSync">
+        <option value="circle">Main circle</option>
+        <option value="circle_dual">+ Dual layer</option>
+        <option value="circle_text">+ Text rings</option>
+        <option value="circle_sigil">+ Sigil</option>
+        <option value="all">All elements</option>
       </select>
     </div>
+    <button id="bTransparent">Transparent BG</button>
     <button id="bSnap">Save PNG</button>
     <button id="bSVG">Save SVG</button>
+    <select id="gifTranspMode" style="font-size:11px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:3px;padding:3px 6px">
+      <option value="none">GIF: Solid BG</option>
+      <option value="matte">GIF: Dark matte</option>
+      <option value="threshold">GIF: Transparent</option>
+    </select>
     <button id="bGIF">Save GIF</button>
     <button id="bMP4">Save MP4</button>
     <span id="gifStatus" style="font-size:11px;color:#888;align-self:center;white-space:nowrap"></span>
@@ -133,8 +141,12 @@ canvas{display:block}
   <div class="panel" id="lpanel">
     <div class="tabs">
       <div class="tab active" data-tab="color">Color</div>
+      <div class="tab" data-tab="speeds">Speeds</div>
       <div class="tab" data-tab="symbols">Symbols</div>
       <div class="tab" data-tab="presets">Presets</div>
+      <div class="tab" data-tab="nodes">Nodes</div>
+      <div class="tab" data-tab="spokes">Spokes</div>
+      <div class="tab" data-tab="sigil">Sigil</div>
     </div>
 
     <!-- COLOR TAB -->
@@ -202,6 +214,168 @@ canvas{display:block}
       </div>
       <div id="userPresets" style="margin-top:6px"></div>
     </div>
+
+    <!-- SPEEDS TAB -->
+    <div class="tabpane" id="tab-speeds">
+      <div class="ph3" style="margin-bottom:6px">Golden presets</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
+        <button class="preset-btn" onclick="applyGolden('unison')">Unison</button>
+        <button class="preset-btn" onclick="applyGolden('duplet')">Duplet</button>
+        <button class="preset-btn" onclick="applyGolden('triplet')">Triplet</button>
+        <button class="preset-btn" onclick="applyGolden('quad')">Quad</button>
+        <button class="preset-btn" onclick="applyGolden('sixth')">Sixth</button>
+        <button class="preset-btn" onclick="applyGolden('custom')">Reset ×1</button>
+      </div>
+      <div class="ph3">Per-element ratio</div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Circle</label><select id="srCircle" class="speed-sel"></select></div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Dual layer</label><select id="srDual" class="speed-sel"></select></div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Text ring 1</label><select id="srText1" class="speed-sel"></select></div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Text ring 2</label><select id="srText2" class="speed-sel"></select></div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Symbols</label><select id="srSymbols" class="speed-sel"></select></div>
+      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Sigil</label><select id="srSigil" class="speed-sel"></select></div>
+      <div style="margin-top:8px;font-size:10px;color:#555;line-height:1.6" id="loopInfoBox">Loop: —</div>
+    </div>
+
+    <!-- NODE SETTINGS -->
+    <div class="tabpane" id="tab-nodes">
+      <div class="ctrl">
+        <label>Shape</label>
+        <select id="dNodeStyle">
+          <option value="circle">Circle</option>
+          <option value="square">Square</option>
+          <option value="diamond">Diamond</option>
+          <option value="triangle">Triangle</option>
+          <option value="cross">Cross</option>
+        </select>
+      </div>
+      <div class="layer" style="margin-top:6px">
+        <input type="checkbox" id="dNodeFill">
+        <span>Fill nodes</span>
+      </div>
+      <div class="layer">
+        <input type="checkbox" id="dNodeRings" checked>
+        <span>Node rings</span>
+      </div>
+      <div class="ctrl" style="margin-top:8px">
+        <label>Size: <span id="vNodeSz" style="color:#aaa">6</span></label>
+        <input type="range" id="dNodeSz" min="2" max="28" value="6" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Multiplier: <span id="vNodeMul" style="color:#aaa">×1</span></label>
+        <input type="range" id="dNodeMul" min="1" max="6" value="1" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Offset: <span id="vNodeOffset" style="color:#aaa">0°</span></label>
+        <input type="range" id="dNodeOffset" min="0" max="180" value="0" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Opacity: <span id="vNodeOpacity" style="color:#aaa">100%</span></label>
+        <input type="range" id="dNodeOpacity" min="10" max="100" value="100" step="1">
+      </div>
+    </div>
+
+    <!-- SPOKE SETTINGS (own tab) -->
+    <div class="tabpane" id="tab-spokes">
+      <div class="ctrl">
+        <label>Style</label>
+        <select id="dSpokeStyle">
+          <option value="solid">Solid</option>
+          <option value="dashed">Dashed</option>
+          <option value="dotted">Dotted</option>
+          <option value="tapered">Tapered</option>
+        </select>
+      </div>
+      <div class="ctrl" style="margin-top:8px">
+        <label>Skip: <span id="vSpokeSkip" style="color:#aaa">1</span></label>
+        <input type="range" id="dSpokeSkip" min="1" max="8" value="1" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Multiplier: <span id="vSpokeMul" style="color:#aaa">×1</span></label>
+        <input type="range" id="dSpokeMul" min="1" max="6" value="1" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Inner: <span id="vSpokeInner" style="color:#aaa">5%</span></label>
+        <input type="range" id="dSpokeInner" min="0" max="90" value="5" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Outer: <span id="vSpokeOuter" style="color:#aaa">95%</span></label>
+        <input type="range" id="dSpokeOuter" min="10" max="100" value="95" step="1">
+      </div>
+      <div class="ctrl">
+        <label>Offset: <span id="vSpokeOffset" style="color:#aaa">0°</span></label>
+        <input type="range" id="dSpokeOffset" min="0" max="180" value="0" step="1">
+      </div>
+    </div>
+
+    <!-- SIGIL TAB -->
+    <div class="tabpane" id="tab-sigil">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <h3 style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px">Sigil layer</h3>
+        <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:#888;cursor:pointer">
+          <input type="checkbox" id="sigilActive"> Enable
+        </label>
+      </div>
+      <div class="textrow">
+        <label>Intention</label>
+        <input type="text" id="sigilIntention" placeholder="e.g. PROTECTION" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+        <button onclick="generateSigil()" style="font-size:11px;padding:3px 8px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:3px;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-left:4px">Go ✦</button>
+      </div>
+      <div style="font-size:10px;color:#666;margin:4px 0 6px;min-height:14px" id="sigilLetterDisplay"></div>
+      <div class="textrow"><label>Reduction</label>
+        <select id="sigilReduction" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+          <option value="dupes">Remove duplicates</option>
+          <option value="dupvow">Dupes + vowels</option>
+          <option value="none">Keep all</option>
+        </select>
+      </div>
+      <div class="textrow"><label>Grid</label>
+        <select id="sigilGrid" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+          <option value="circle">Letter circle</option>
+          <option value="wheel">Number wheel</option>
+          <option value="rosecross">Rose Cross</option>
+          <option value="grid5">5×5 square</option>
+          <option value="chaos">Chaos scatter</option>
+        </select>
+      </div>
+      <div class="textrow"><label>Line</label>
+        <select id="sigilLineStyle" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+          <option value="bezier">Bezier</option>
+          <option value="angular">Angular</option>
+          <option value="arc">Arc</option>
+        </select>
+      </div>
+      <div class="textrow"><label>Terminals</label>
+        <select id="sigilTerminal" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+          <option value="dot">Dot</option>
+          <option value="circle">Circle</option>
+          <option value="diamond">Diamond</option>
+          <option value="cross">Cross</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div class="textrow"><label>Blend</label>
+        <select id="sigilBlend" style="flex:1;min-width:0;font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:3px;padding:2px 4px">
+          <option value="normal">Normal</option>
+          <option value="screen">Screen</option>
+          <option value="overlay">Overlay</option>
+          <option value="soft-light">Soft light</option>
+          <option value="color-dodge">Color dodge</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #111;font-size:11px;color:#777;margin-bottom:6px">
+        <input type="checkbox" id="sigilSyncPts">
+        <span>Sync letter count → circle points</span>
+      </div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Symmetry</label><input type="range" id="sigilSymmetry" min="1" max="16" value="6" step="1"><span class="val" id="vSigilSymmetry">6</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Ring offset</label><input type="range" id="sigilOffsetR" min="20" max="100" value="75" step="1"><span class="val" id="vSigilOffsetR">0.75</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Scale</label><input type="range" id="sigilScale" min="20" max="130" value="70" step="1"><span class="val" id="vSigilScale">70%</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Rotate</label><input type="range" id="sigilRot" min="0" max="360" value="0" step="1"><span class="val" id="vSigilRot">0°</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Opacity</label><input type="range" id="sigilOpacity" min="5" max="100" value="70" step="1"><span class="val" id="vSigilOpacity">70%</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Weight</label><input type="range" id="sigilWeight" min="20" max="300" value="100" step="5"><span class="val" id="vSigilWeight">1.0×</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Smooth</label><input type="range" id="sigilSmooth" min="0" max="100" value="40" step="1"><span class="val" id="vSigilSmooth">40%</span></div>
+      <div class="ctrl" style="margin-bottom:5px"><label>Chaos seed</label><input type="range" id="sigilSeed" min="1" max="999" value="42" step="1"><span class="val" id="vSigilSeed">42</span></div>
+    </div>
+
   </div>
 
   <!-- CANVAS -->
@@ -270,21 +444,11 @@ canvas{display:block}
       <div class="layer"><label style="font-size:11px;color:#777;flex:1">Double ring</label><input type="checkbox" id="dDouble" checked></div>
       <div class="layer"><label style="font-size:11px;color:#777;flex:1">Dashed ring</label><input type="checkbox" id="dDash"></div>
       <div class="layer"><label style="font-size:11px;color:#777;flex:1">Star fill</label><input type="checkbox" id="dStarFill"></div>
-      <div class="layer"><label style="font-size:11px;color:#777;flex:1">Node rings</label><input type="checkbox" id="dNodeRings" checked></div>
-      <div style="margin-top:6px">
-        <label style="font-size:10px;color:#555">Node size</label>
-        <input type="range" id="dNodeSz" min="2" max="20" value="6" step="1" style="width:100%">
-        <span class="val" id="vNodeSz">6</span>
-      </div>
+
       <div>
         <label style="font-size:10px;color:#555">Tick count multiplier</label>
         <input type="range" id="dTickMul" min="1" max="6" value="2" step="1" style="width:100%">
         <span class="val" id="vTickMul">x2</span>
-      </div>
-      <div>
-        <label style="font-size:10px;color:#555">Spoke skip</label>
-        <input type="range" id="dSpokeSkip" min="1" max="4" value="1" step="1" style="width:100%">
-        <span class="val" id="vSpokeSkip">1</span>
       </div>
     </div>
   </div>
@@ -334,7 +498,8 @@ const BGS={'#000000':'Black','#070010':'Deep void','#000820':'Night sea','#10000
 let S={
   style:'star',pts:6,rings:3,detail:3,scale:100,lw:1.2,glow:16,opacity:1,rotate:0,speed:5,
   color:'#FFD700',glow2:'#AA6600',color2:'#BB88FF',bg:'#000000',
-  anim:false,sparks:false,dual:false,pulse:false,mirror:false,
+  anim:false,sparks:false,dual:false,pulse:false,mirror:false,transparentBg:false,gifTranspMode:'none',
+  speeds:{circle:[1,1],dual:[1,1],text1:[1,3],text2:[1,3],symbols:[1,1],sigil:[1,4]},
   symSize:16,symR:100,
   symbols:[],
   tr:[
@@ -343,7 +508,26 @@ let S={
     {text:'',s:20,y:0}
   ],
   layers:{outer:true,inner:true,geom:true,nodes:true,spokes:true,ticks:true,center:true,symbols:true,textRings:true,sparks:true},
-  detail2:{cross:true,double:true,dash:false,starFill:false,nodeRings:true,nodeSz:6,tickMul:2,spokeSkip:1,centerPat:0}
+  detail2:{cross:true,double:true,dash:false,starFill:false,nodeRings:true,nodeSz:6,tickMul:2,spokeSkip:1,centerPat:0,spokeInner:5,spokeOuter:95,spokeMul:1,spokeStyle:'solid',spokeOffset:0,nodeStyle:'circle',nodeFill:false,nodeOffset:0,nodeMul:1,nodeOpacity:1.0},
+  sigil:{
+    active:false,
+    intention:'',
+    reduction:'dupes',
+    grid:'circle',
+    lineStyle:'bezier',
+    terminal:'dot',
+    smooth:0.4,
+    scale:70,
+    rotate:0,
+    opacity:0.7,
+    weight:1.0,
+    blendMode:'normal',
+    syncPts:false,
+    letters:[],
+    color:'same',
+    symmetry:6,
+    offsetR:0.75
+  }
 };
 
 let animId=null,animT=0,t=0,sparks=[];
@@ -371,7 +555,38 @@ function ss(a=1,c=null){
   ctx.lineWidth=S.lw;
 }
 function circ(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();}
-function miniCircs(r,n,sr,rot){for(let i=0;i<n;i++){const a=rot+i*TAU/n;circ(cx()+r*Math.cos(a),cy()+r*Math.sin(a),sr);}}
+function miniCircs(r,n,sr,rot){
+  const D=S.detail2;
+  const total=n*(D.nodeMul||1);
+  const offsetRad=(D.nodeOffset||0)*Math.PI/180;
+  const savedAlpha=ctx.globalAlpha;
+  ctx.globalAlpha=savedAlpha*(D.nodeOpacity||1);
+  for(let i=0;i<total;i++){
+    const a=rot+offsetRad+i*TAU/total;
+    const nx=cx()+r*Math.cos(a),ny=cy()+r*Math.sin(a);
+    const style=D.nodeStyle||'circle';
+    ctx.beginPath();
+    if(style==='circle'){
+      ctx.arc(nx,ny,sr,0,Math.PI*2);
+    } else if(style==='square'){
+      ctx.rect(nx-sr,ny-sr,sr*2,sr*2);
+    } else if(style==='diamond'){
+      ctx.moveTo(nx,ny-sr*1.4);ctx.lineTo(nx+sr,ny);ctx.lineTo(nx,ny+sr*1.4);ctx.lineTo(nx-sr,ny);ctx.closePath();
+    } else if(style==='cross'){
+      ctx.moveTo(nx-sr,ny);ctx.lineTo(nx+sr,ny);ctx.moveTo(nx,ny-sr);ctx.lineTo(nx,ny+sr);
+    } else if(style==='triangle'){
+      ctx.moveTo(nx,ny-sr*1.3);ctx.lineTo(nx+sr*1.1,ny+sr*0.8);ctx.lineTo(nx-sr*1.1,ny+sr*0.8);ctx.closePath();
+    }
+    if(style==='cross'){
+      ctx.stroke();
+    } else if(D.nodeFill){
+      ctx.fill();ctx.stroke();
+    } else {
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=savedAlpha;
+}
 function starPoly(r,n,skip,rot){
   const pts=[];for(let i=0;i<n;i++)pts.push([cx()+r*Math.cos(rot+i*TAU/n),cy()+r*Math.sin(rot+i*TAU/n)]);
   ctx.beginPath();for(let i=0;i<n;i++){const[x,y]=pts[(i*skip)%n];i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.stroke();
@@ -383,8 +598,40 @@ function tickMarks(r,n,len,rot){
 }
 function spokeDraw(r1,r2,n,rot){
   if(!S.layers.spokes)return;
-  const sk=S.detail2.spokeSkip;
-  for(let i=0;i<n;i+=sk){const a=rot+i*TAU/n;ctx.beginPath();ctx.moveTo(cx()+r1*Math.cos(a),cy()+r1*Math.sin(a));ctx.lineTo(cx()+r2*Math.cos(a),cy()+r2*Math.sin(a));ctx.stroke();}
+  const D=S.detail2,sk=D.spokeSkip;
+  // Apply inner/outer radius overrides as fraction of the passed-in r1/r2
+  const ri=r1+(r2-r1)*(D.spokeInner/100);
+  const ro=r1+(r2-r1)*(D.spokeOuter/100);
+  const offsetRad=(D.spokeOffset||0)*Math.PI/180;
+  const total=n*(D.spokeMul||1);
+  const savedLW=ctx.lineWidth;
+  for(let i=0;i<total;i+=sk){
+    const a=rot+offsetRad+i*TAU/total;
+    ctx.beginPath();
+    if(D.spokeStyle==='tapered'){
+      // tapered: wide at outer, narrow at inner using quadratic trick
+      ctx.lineWidth=savedLW*0.3;
+    } else if(D.spokeStyle==='dashed'){
+      ctx.setLineDash([6,5]);
+    } else if(D.spokeStyle==='dotted'){
+      ctx.setLineDash([2,6]);
+    }
+    ctx.moveTo(cx()+ri*Math.cos(a),cy()+ri*Math.sin(a));
+    ctx.lineTo(cx()+ro*Math.cos(a),cy()+ro*Math.sin(a));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth=savedLW;
+    // Tapered: draw second wider line over outer 40%
+    if(D.spokeStyle==='tapered'){
+      const midR=ri+(ro-ri)*0.6;
+      ctx.lineWidth=savedLW*1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx()+midR*Math.cos(a),cy()+midR*Math.sin(a));
+      ctx.lineTo(cx()+ro*Math.cos(a),cy()+ro*Math.sin(a));
+      ctx.stroke();
+      ctx.lineWidth=savedLW;
+    }
+  }
 }
 function polyN(r,rot,sides){
   ctx.save();ctx.translate(cx(),cy());ctx.rotate(rot);
@@ -629,19 +876,21 @@ function drawStyle(style,R,rot,er,alpha=1,useCol2=false){
     drawCenterFor('rose',R,r2);
   }
   else if(style==='enochian'){
-    circ(cx(),cy(),R);
+    if(L.outer)circ(cx(),cy(),R);
     const tables=4,sq=R*0.55;
-    for(let i=0;i<tables;i++){
-      const a=r2+i*TAU/tables;
-      ctx.save();ctx.translate(cx()+R*0.45*Math.cos(a),cy()+R*0.45*Math.sin(a));ctx.rotate(a);
-      ctx.strokeRect(-sq*0.28,-sq*0.28,sq*0.56,sq*0.56);
-      if(d>2){ctx.beginPath();ctx.moveTo(-sq*0.28,0);ctx.lineTo(sq*0.28,0);ctx.moveTo(0,-sq*0.28);ctx.lineTo(0,sq*0.28);ctx.stroke();}
-      ctx.restore();
+    if(L.geom){
+      for(let i=0;i<tables;i++){
+        const a=r2+i*TAU/tables;
+        ctx.save();ctx.translate(cx()+R*0.45*Math.cos(a),cy()+R*0.45*Math.sin(a));ctx.rotate(a);
+        ctx.strokeRect(-sq*0.28,-sq*0.28,sq*0.56,sq*0.56);
+        if(d>2){ctx.beginPath();ctx.moveTo(-sq*0.28,0);ctx.lineTo(sq*0.28,0);ctx.moveTo(0,-sq*0.28);ctx.lineTo(0,sq*0.28);ctx.stroke();}
+        ctx.restore();
+      }
+      starPoly(R*0.52,tables*2,2,r2+Math.PI/tables);
     }
-    starPoly(R*0.52,tables*2,2,r2+Math.PI/tables);
-    circ(cx(),cy(),R*0.22);
-    if(d>1)spokeDraw(R*0.22,R*0.65,tables*2,r2);
-    if(d>3){miniCircs(R,n,D.nodeSz,r2);tickMarks(R*0.97,n*3,6,r2);}
+    if(L.inner)circ(cx(),cy(),R*0.22);
+    if(d>1&&L.spokes)spokeDraw(R*0.22,R*0.65,tables*2,r2);
+    if(d>3){if(L.nodes)miniCircs(R,n,D.nodeSz,r2);if(L.ticks)tickMarks(R*0.97,n*3,6,r2);}
     drawCenterFor('enochian',R,r2);
   }
 
@@ -738,7 +987,7 @@ function drawStyle(style,R,rot,er,alpha=1,useCol2=false){
     for(let i=0;i<seg;i++){
       const a=r2+i*TAU/seg;
       // dividing spokes
-      if(L.spokes){
+      if(L.geom&&L.spokes){
         const sk=S.detail2.spokeSkip;
         if(i%sk===0){ctx.beginPath();ctx.moveTo(cx()+R*0.35*Math.cos(a),cy()+R*0.35*Math.sin(a));ctx.lineTo(cx()+R*0.97*Math.cos(a),cy()+R*0.97*Math.sin(a));ctx.stroke();}
       }
@@ -935,7 +1184,7 @@ function drawSymbols(extraRot){
   if(!S.layers.symbols||!S.symbols.length)return;
   const syms=S.symbols;
   const R=baseR()*S.symR/100;
-  const rot=S.rotate*Math.PI/180+extraRot;
+  const rot=S.rotate*Math.PI/180+extraRot*speedOf('symbols');
   ctx.save();
   ctx.font=`${S.symSize}px serif`;
   ctx.fillStyle=col(0.85);
@@ -969,43 +1218,273 @@ function updateSparks(){
   }
 }
 
+// ── Speed ratio system ──
+// All ratios available in the dropdowns: [num, den, label]
+const SPEED_RATIOS=[
+  [0,1,'0 (still)'],[1,6,'1/6'],[1,5,'1/5'],[1,4,'1/4'],[1,3,'1/3'],[1,2,'1/2'],
+  [2,3,'2/3'],[3,4,'3/4'],[1,1,'1×'],[4,3,'4/3'],[3,2,'3/2'],[2,1,'2×'],[3,1,'3×']
+];
+function ratioToDecimal(r){return r[1]===0?0:r[0]/r[1];}
+function ratioFrac(r){return [r[0],r[1]];}  // [num,den] for LCM calc
+function speedOf(key){return ratioToDecimal(S.speeds[key]);}
+
 // ── main draw ──
 function draw(extraRot){
   const cw=W(),ch=H();
   ctx.clearRect(0,0,cw,ch);
-  ctx.fillStyle=S.bg;ctx.fillRect(0,0,cw,ch);
+  if(!S.transparentBg){ctx.fillStyle=S.bg;ctx.fillRect(0,0,cw,ch);}
   const R=baseR(),rot=S.rotate*Math.PI/180;
   const tr=S.tr;
 
   if(S.mirror){
     ctx.save();ctx.scale(-1,1);ctx.translate(-cw,0);
     ctx.globalAlpha=0.35;
-    drawStyle(S.style,R,rot,extraRot);
+    drawStyle(S.style,R,rot,extraRot*speedOf('circle'));
     ctx.restore();ctx.globalAlpha=1;
   }
   if(S.dual){
     ctx.globalAlpha=0.4;
-    drawStyle(S.style,R*0.82,rot+Math.PI/S.pts,-extraRot*1.2,0.6,true);
+    drawStyle(S.style,R*0.82,rot+Math.PI/S.pts,-extraRot*speedOf('dual'),0.6,true);
     ctx.globalAlpha=1;
   }
 
   let drawR=R;
   if(S.pulse){const ps=1+0.045*Math.sin(t*3);ctx.save();ctx.translate(cx(),cy());ctx.scale(ps,ps);ctx.translate(-cx(),-cy());drawR=R;}
 
-  drawStyle(S.style,drawR,rot,extraRot);
+  drawStyle(S.style,drawR,rot,extraRot*speedOf('circle'));
   if(S.pulse)ctx.restore();
+  // Draw embedded sigil layer (always draws when active, regardless of geom layer)
+  drawSigilOnCanvas(extraRot);
 
   // text rings
   if(S.layers.textRings){
-    const animO=extraRot*0.3;
-    drawTextRing(tr[0].text,tr[0].r,tr[0].s,tr[0].sp,tr[0].off,tr[0].flip,animO);
-    drawTextRing(tr[1].text,tr[1].r,tr[1].s,tr[1].sp,tr[1].off,tr[1].flip,-animO*1.3);
+    const animO1=extraRot*speedOf('text1');
+    const animO2=extraRot*speedOf('text2');
+    drawTextRing(tr[0].text,tr[0].r,tr[0].s,tr[0].sp,tr[0].off,tr[0].flip,animO1);
+    drawTextRing(tr[1].text,tr[1].r,tr[1].s,tr[1].sp,tr[1].off,tr[1].flip,-animO2);
     drawCenterText(tr[2].text,tr[2].s,tr[2].y);
   }
 
   drawSymbols(extraRot);
   updateSparks();
 }
+
+// ══════════════════════════════════════════════
+// ── SYMMETRIC SIGIL ENGINE ──
+// ══════════════════════════════════════════════
+
+const VOWELS_S=new Set('AEIOU');
+function sigilProcessLetters(text,mode){
+  const upper=text.toUpperCase().replace(/[^A-Z]/g,'');
+  if(mode==='none')return[...upper];
+  const seen=new Set(),out=[];
+  for(const ch of upper){
+    if(seen.has(ch))continue;
+    if(mode==='dupvow'&&VOWELS_S.has(ch))continue;
+    seen.add(ch);out.push(ch);
+  }
+  return out;
+}
+
+function sigilSeededRand(seed){let s=seed|0;return()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};}
+
+// ── Map letters to angles on a circle ──
+// Each letter gets a fixed angle on the ring; the sigil path connects them in order.
+// Symmetry is achieved by ROTATING a copy of the full path by 360/symmetry degrees
+// and drawing all copies — like a kaleidoscope.
+function sigilLetterAngles(letters, symmetry, R, seed, gridType){
+  const TAU=Math.PI*2;
+  const rand=sigilSeededRand(seed);
+  const angles={};
+  const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  if(gridType==='circle'){
+    // Letters evenly spaced: A at 0, B at 1/26, etc.
+    for(let i=0;i<26;i++) angles[alpha[i]]=((i/26)*TAU)-Math.PI/2;
+  } else if(gridType==='wheel'){
+    // Numerology: 9 positions, letters cluster at their number
+    const num={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+    // Spread letters sharing a number slightly so they don't pile up
+    const counts={};
+    const result={};
+    for(const ch of alpha){
+      const n=num[ch];
+      counts[n]=(counts[n]||0)+1;
+    }
+    const placed={};
+    for(const ch of alpha){
+      const n=num[ch];
+      placed[n]=(placed[n]||0);
+      const baseAngle=((n-1)/9)*TAU-Math.PI/2;
+      const spread=(TAU/9)*0.4;
+      const offset=counts[n]>1?(placed[n]/(counts[n]-1)-0.5)*spread:0;
+      result[ch]=baseAngle+offset;
+      placed[n]++;
+    }
+    Object.assign(angles,result);
+  } else if(gridType==='chaos'){
+    // Seeded random angles on the circle
+    for(const ch of alpha) angles[ch]=rand()*Math.PI*2;
+  } else if(gridType==='rosecross'||gridType==='grid5'){
+    // Map the grid position to an angle by treating (col,row) as a vector from center
+    const rows=gridType==='grid5'?5:8, cols=3;
+    for(let i=0;i<alpha.length;i++){
+      const row=Math.floor(i/cols),col=i%cols;
+      const dx=(col-(cols-1)/2), dy=(row-(rows-1)/2);
+      angles[alpha[i]]=Math.atan2(dy,dx);
+    }
+  }
+  return angles;
+}
+
+// Build path points for one arm of the sigil
+function sigilBuildPath(letters, angles, R, offsetR, cx2, cy2){
+  return letters.map(ch=>{
+    const a=angles[ch]||0;
+    const r=R*(offsetR);
+    return{x:cx2+r*Math.cos(a), y:cy2+r*Math.sin(a)};
+  }).filter(Boolean);
+}
+
+// Draw one symmetric sigil path (all rotational copies)
+function drawSymSigilPath(pathPts, symmetry, cx2, cy2, lineStyle, smooth, terminal, lw, glow, glow2, sigilCol){
+  if(pathPts.length<2)return;
+  const TAU=Math.PI*2;
+  for(let sym=0;sym<symmetry;sym++){
+    const angle=(sym/symmetry)*TAU;
+    ctx.save();
+    ctx.translate(cx2,cy2);
+    ctx.rotate(angle);
+    ctx.translate(-cx2,-cy2);
+
+    ctx.strokeStyle=sigilCol;ctx.fillStyle=sigilCol;
+    ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.shadowBlur=glow;ctx.shadowColor=glow2;
+
+    if(lineStyle==='angular'){
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++)ctx.lineTo(pathPts[i].x,pathPts[i].y);
+      ctx.stroke();
+    } else if(lineStyle==='bezier'){
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++){
+        const prev=pathPts[i-1],curr=pathPts[i];
+        const mx=(prev.x+curr.x)/2,my=(prev.y+curr.y)/2;
+        const cp1x=prev.x+(mx-prev.x)*smooth,cp1y=prev.y+(my-prev.y)*smooth;
+        const cp2x=curr.x+(mx-curr.x)*smooth,cp2y=curr.y+(my-curr.y)*smooth;
+        ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,curr.x,curr.y);
+      }
+      ctx.stroke();
+    } else { // arc
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++){
+        const prev=pathPts[i-1],curr=pathPts[i];
+        const mx=(prev.x+curr.x)/2,my=(prev.y+curr.y)/2;
+        ctx.quadraticCurveTo(cx2+(mx-cx2)*smooth*0.4,cy2+(my-cy2)*smooth*0.4,curr.x,curr.y);
+      }
+      ctx.stroke();
+    }
+
+    // Terminals on first/last point
+    if(terminal!=='none'){
+      const tsz=lw*2.2;
+      [pathPts[0],pathPts[pathPts.length-1]].forEach(p=>{
+        if(terminal==='dot'){ctx.beginPath();ctx.arc(p.x,p.y,tsz,0,TAU);ctx.fill();}
+        else if(terminal==='circle'){const pl=ctx.lineWidth;ctx.lineWidth=lw*0.6;ctx.beginPath();ctx.arc(p.x,p.y,tsz*1.6,0,TAU);ctx.stroke();ctx.lineWidth=pl;}
+        else if(terminal==='diamond'){ctx.beginPath();ctx.moveTo(p.x,p.y-tsz*1.4);ctx.lineTo(p.x+tsz,p.y);ctx.lineTo(p.x,p.y+tsz*1.4);ctx.lineTo(p.x-tsz,p.y);ctx.closePath();ctx.fill();}
+        else if(terminal==='cross'){const pl=ctx.lineWidth;ctx.lineWidth=lw*0.7;ctx.beginPath();ctx.moveTo(p.x-tsz,p.y);ctx.lineTo(p.x+tsz,p.y);ctx.moveTo(p.x,p.y-tsz);ctx.lineTo(p.x,p.y+tsz);ctx.stroke();ctx.lineWidth=pl;}
+      });
+    }
+    ctx.restore();
+  }
+}
+
+function drawSigilOnCanvas(extraRot){
+  const sg=S.sigil;
+  if(!sg.active||!Array.isArray(sg.letters)||sg.letters.length<2)return;
+
+  const R=baseR()*sg.scale/100;
+  const baseAngleOffset=sg.rotate*Math.PI/180+(extraRot||0)*speedOf('sigil');
+  const symmetry=sg.symmetry||S.pts||6;
+  const seed=sg.seed||42;
+
+  // Get letter->angle mapping
+  const angles=sigilLetterAngles(sg.letters,symmetry,R,seed,sg.grid);
+  // Apply base rotation to all angles
+  const rotatedAngles={};
+  for(const [ch,a] of Object.entries(angles)) rotatedAngles[ch]=a+baseAngleOffset;
+
+  // Build the sigil path at the configured radial offset
+  const pathPts=sigilBuildPath(sg.letters,rotatedAngles,R,sg.offsetR||0.75,cx(),cy());
+  if(pathPts.length<2)return;
+
+  // Colour
+  const h=sg.color==='same'?S.color:sg.color;
+  const r=parseInt(h.slice(1,3),16),g2=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  const sigilCol=`rgba(${r},${g2},${b},${sg.opacity})`;
+
+  ctx.save();
+  ctx.globalCompositeOperation=sg.blendMode||'normal';
+
+  drawSymSigilPath(
+    pathPts, symmetry, cx(), cy(),
+    sg.lineStyle, sg.smooth,
+    sg.terminal,
+    S.lw*sg.weight, S.glow*1.5, S.glow2,
+    sigilCol
+  );
+
+  ctx.restore();
+}
+
+function generateSigil(){
+  const intent=document.getElementById('sigilIntention').value.trim();
+  if(!intent){S.sigil.letters=[];if(!S.anim)render();return;}
+  S.sigil.intention=intent;
+  S.sigil.reduction=document.getElementById('sigilReduction').value;
+  S.sigil.letters=sigilProcessLetters(intent,S.sigil.reduction);
+  document.getElementById('sigilLetterDisplay').textContent=
+    S.sigil.letters.length?'Letters: '+S.sigil.letters.join(' · '):'(no letters remaining)';
+  if(S.sigil.syncPts&&S.sigil.letters.length>=3){
+    S.pts=Math.min(16,Math.max(3,S.sigil.letters.length));
+    const pEl=document.getElementById('tPts');
+    if(pEl){pEl.value=S.pts;document.getElementById('vPts').textContent=S.pts;}
+  }
+  if(!S.anim)render();
+}
+
+function wireSigilControls(){
+  document.getElementById('sigilActive').addEventListener('change',e=>{S.sigil.active=e.target.checked;if(!S.anim)render();});
+  document.getElementById('sigilSyncPts').addEventListener('change',e=>{S.sigil.syncPts=e.target.checked;if(e.target.checked&&S.sigil.letters.length>=3)generateSigil();});
+  ['sigilReduction','sigilGrid','sigilLineStyle','sigilTerminal','sigilBlend'].forEach(id=>{
+    document.getElementById(id).addEventListener('change',e=>{
+      const key={sigilReduction:'reduction',sigilGrid:'grid',sigilLineStyle:'lineStyle',sigilTerminal:'terminal',sigilBlend:'blendMode'}[id];
+      S.sigil[key]=e.target.value;
+      if(id==='sigilReduction')generateSigil();else if(!S.anim)render();
+    });
+  });
+  [
+    ['sigilScale','scale','vSigilScale',v=>v+'%',v=>v],
+    ['sigilRot','rotate','vSigilRot',v=>v+'°',v=>v],
+    ['sigilOpacity','opacity','vSigilOpacity',v=>v+'%',v=>v/100],
+    ['sigilWeight','weight','vSigilWeight',v=>(v/100).toFixed(1)+'×',v=>v/100],
+    ['sigilSmooth','smooth','vSigilSmooth',v=>v+'%',v=>v/100],
+    ['sigilSeed','seed','vSigilSeed',null,v=>v],
+    ['sigilSymmetry','symmetry','vSigilSymmetry',null,v=>v],
+    ['sigilOffsetR','offsetR','vSigilOffsetR',v=>(v/100).toFixed(2),v=>v/100],
+  ].forEach(([id,key,valId,fmt,conv])=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.addEventListener('input',()=>{
+      const v=+el.value;
+      S.sigil[key]=conv(v);
+      if(valId)document.getElementById(valId).textContent=fmt?fmt(v):v;
+      if(!S.anim)render();
+    });
+  });
+  document.getElementById('sigilIntention').addEventListener('keydown',e=>{if(e.key==='Enter')generateSigil();});
+}
+wireSigilControls();
 
 function render(){draw(0);}
 
@@ -1022,9 +1501,66 @@ function getQualitySize(){
   const q=document.getElementById('eQuality').value;
   return{low:240,med:360,high:480,ultra:720}[q]||360;
 }
-function getFrameCount(){
-  return parseInt(document.getElementById('eFrames').value)||60;
+// ── Full loop calculation ──
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function lcmInt(a,b){return Math.round(a/gcd(Math.round(a),Math.round(b))*b);}
+function lcmFracs(fracs){
+  // fracs = [[num,den],...] representing period lengths
+  let ln=fracs[0][0],ld=fracs[0][1];
+  for(let i=1;i<fracs.length;i++){
+    const n=fracs[i][0],d=fracs[i][1];
+    // lcm(ln/ld, n/d) = lcm(ln*d, n*ld) / (ld*d)
+    const newN=lcmInt(ln*d, n*ld);
+    const newD=ld*d;
+    const g=gcd(newN,newD);
+    ln=newN/g; ld=newD/g;
+  }
+  return ln/ld;
 }
+function getFullLoopAnimT(){
+  const sync=document.getElementById('loopSync').value;
+  // Periods as [num, den] fractions of 2π
+  // period = 1/rate, rate = how many times faster than extraRot
+  const P={
+    circle:  [1,1],    // rate 1     → period 1
+    dual:    [5,6],    // rate 6/5   → period 5/6
+    text1:   [10,3],   // rate 3/10  → period 10/3
+    text2:   [5,2],    // rate 2/5   → period 5/2
+    sigil:   [5,1],    // rate 1/5   → period 5
+  };
+  // Build periods from actual S.speeds values
+  function periodFrac(speedArr){
+    // period = 1/rate = den/num (if num=0, element is still, period=∞, ignore it)
+    if(speedArr[0]===0)return null;
+    return [speedArr[1],speedArr[0]]; // [den,num]
+  }
+  const allPeriods={
+    circle:  periodFrac(S.speeds.circle),
+    dual:    periodFrac(S.speeds.dual),
+    text1:   periodFrac(S.speeds.text1),
+    text2:   periodFrac(S.speeds.text2),
+    symbols: periodFrac(S.speeds.symbols),
+    sigil:   periodFrac(S.speeds.sigil),
+  };
+  const groups={
+    'circle':       ['circle'],
+    'circle_dual':  ['circle','dual'],
+    'circle_text':  ['circle','text1','text2'],
+    'circle_sigil': ['circle','sigil'],
+    'all':          ['circle','dual','text1','text2','sigil'],
+  };
+  const keys=groups[sync]||['circle'];
+  const fracs=keys.map(k=>allPeriods[k]).filter(Boolean);
+  if(fracs.length===0)return Math.PI*2; // fallback
+  const loopPeriod=lcmFracs(fracs); // in multiples of 2π
+  return loopPeriod*Math.PI*2; // total animT for one full loop
+}
+function getLoopFrameCount(fps){
+  const animTTotal=getFullLoopAnimT();
+  const advPerFrame=S.speed*0.001*(60/fps);
+  return Math.max(12,Math.round(animTTotal/advPerFrame));
+}
+function getFrameCount(){return 60;} // legacy fallback
 function renderOffscreen(sz){
   const off=document.createElement('canvas');off.width=off.height=sz;
   const oc=off.getContext('2d');oc.drawImage(CV,0,0,sz,sz);return off;
@@ -1042,10 +1578,7 @@ function exportSVG(){
   const sz=getQualitySize();
   const off=renderOffscreen(sz);
   const pngData=off.toDataURL('image/png');
-  const svgStr=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">
-  <rect width="${sz}" height="${sz}" fill="${S.bg}"/>
-  <image href="${pngData}" x="0" y="0" width="${sz}" height="${sz}"/>
-</svg>`;
+  const bgRect=S.transparentBg?'':`<rect width="${sz}" height="${sz}" fill="${S.bg}"/>`;const svgStr=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">${bgRect}<image href="${pngData}" x="0" y="0" width="${sz}" height="${sz}"/></svg>`;
   const blob=new Blob([svgStr],{type:'image/svg+xml'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.download='magic_circle.svg';a.href=url;a.click();
@@ -1154,7 +1687,7 @@ const GIFEncoder=(()=>{
   }
 
   // Encode frames: [{pixels:Uint8ClampedArray(w*h*4), delay:ms}]
-  function encode(frames,w,h){
+  function encode(frames,w,h,useTransparency){
     const out=[];
     const u16=v=>{out.push(v&0xff,(v>>8)&0xff);};
     const str=s=>{for(let i=0;i<s.length;i++)out.push(s.charCodeAt(i)&0xff);};
@@ -1169,6 +1702,8 @@ const GIFEncoder=(()=>{
     // GIF89a header
     str('GIF89a');u16(w);u16(h);
     out.push(0xf7,0,0); // packed: GCT present, 8bpp; bg index 0; pixel aspect 0
+    // If transparent, overwrite palette entry 0 with pure black (the transparent colour)
+    if(useTransparency){pal[0]=0;pal[1]=0;pal[2]=0;}
     for(let i=0;i<768;i++)out.push(pal[i]);
 
     // Netscape looping extension (loops forever)
@@ -1177,12 +1712,25 @@ const GIFEncoder=(()=>{
     for(const frame of frames){
       const delay=Math.max(5,Math.round(frame.delay/10)); // centiseconds, min 2
       // Graphic control extension
-      out.push(0x21,0xf9,0x04,0x00);u16(delay);out.push(0,0);
+      // Byte 4: flags — bit0=transpFlag, bits3-4=disposal(2=restore to bg)
+      const gceFlags=useTransparency?0x09:0x00; // 0x09 = disposal:2 + transparent flag
+      const transpIdx=useTransparency?0:0;
+      out.push(0x21,0xf9,0x04,gceFlags);u16(delay);out.push(transpIdx,0);
       // Image descriptor
       out.push(0x2c);u16(0);u16(0);u16(w);u16(h);out.push(0);
       // Quantise pixels to palette indices
       const px=frame.pixels,idx=new Uint8Array(w*h);
-      for(let i=0;i<w*h;i++){const j=i*4;idx[i]=nq.map(px[j],px[j+1],px[j+2]);}
+      const ALPHA_THRESHOLD=30; // pixels below this alpha become transparent
+      for(let i=0;i<w*h;i++){
+        const j=i*4;
+        if(useTransparency&&px[j+3]<ALPHA_THRESHOLD){
+          idx[i]=0; // map to transparent palette entry
+        } else {
+          // Avoid accidentally mapping to index 0 (reserved for transparency)
+          const mapped=nq.map(px[j],px[j+1],px[j+2]);
+          idx[i]=useTransparency?(mapped===0?1:mapped):mapped;
+        }
+      }
       // LZW compress and write
       out.push(8);writeSubBlocks(out,lzwEncode(idx,8));
     }
@@ -1198,7 +1746,9 @@ const GIFEncoder=(()=>{
 function exportMP4(){
   const wasAnim=S.anim;
   const statusEl=document.getElementById('gifStatus');
-  const FPS=30,FRAMES=getFrameCount(),SZ=getQualitySize();
+  const FPS=30;
+  const FRAMES=Math.min(3600,getLoopFrameCount(FPS));
+  const SZ=getQualitySize();
   const off=document.createElement('canvas');off.width=off.height=SZ;
   const oc=off.getContext('2d');
   const stream=off.captureStream(FPS);
@@ -1245,10 +1795,20 @@ function exportGIF(){
   if(wasAnim){stopAnim();S.anim=false;document.getElementById('bAnim').textContent='▶ Play';document.getElementById('bAnim').classList.remove('on');}
 
   const statusEl=document.getElementById('gifStatus');
-  const FPS=20;
-  const FRAMES=getFrameCount();
+  const GIF_FPS=15;
+  const FRAMES=Math.min(500,getLoopFrameCount(GIF_FPS));
+  const FPS=GIF_FPS;
   const DELAY=Math.round(1000/FPS);
   const SZ=getQualitySize();
+
+  // Handle transparency modes
+  const gifMode=document.getElementById('gifTranspMode').value;
+  const savedTranspBg=S.transparentBg;
+  const savedBg=S.bg;
+  if(gifMode==='matte'){S.transparentBg=false;S.bg='#080808';}
+  else if(gifMode==='threshold'){S.transparentBg=true;}
+  else{S.transparentBg=false;}
+  const useTransp=gifMode==='threshold';
 
   const off=document.createElement('canvas');
   off.width=off.height=SZ;
@@ -1259,11 +1819,13 @@ function exportGIF(){
 
   function captureNext(){
     if(frame>=FRAMES){
+      // Restore bg state before encoding
+      S.transparentBg=savedTranspBg;S.bg=savedBg;
       statusEl.textContent='Encoding…';
       // yield to browser to update UI, then encode
       setTimeout(()=>{
         try{
-          const gif=GIFEncoder.encode(frames,SZ,SZ);
+          const gif=GIFEncoder.encode(frames,SZ,SZ,useTransp);
           const blob=new Blob([gif],{type:'image/gif'});
           const url=URL.createObjectURL(blob);
           const a=document.createElement('a');
@@ -1273,14 +1835,14 @@ function exportGIF(){
           setTimeout(()=>URL.revokeObjectURL(url),3000);
           statusEl.textContent='Saved!';
           setTimeout(()=>statusEl.textContent='',3000);
-        }catch(e){statusEl.textContent='Error: '+e.message;}
+        }catch(e){statusEl.textContent='Error: '+e.message;S.transparentBg=savedTranspBg;S.bg=savedBg;}
         gifWorking=false;
         if(wasAnim){S.anim=true;document.getElementById('bAnim').textContent='⏹ Stop';document.getElementById('bAnim').classList.add('on');animate();}
       },50);
       return;
     }
     // Match live speed: same angle increment as live animation at ~60fps
-    const angle=animT+(frame*(S.speed*0.001*(60/20)));
+    const angle=animT+(frame*(S.speed*0.001*(60/FPS)));
     draw(angle);
     offCtx.clearRect(0,0,SZ,SZ);
     offCtx.drawImage(CV,0,0,SZ,SZ);
@@ -1290,8 +1852,79 @@ function exportGIF(){
     statusEl.textContent='Frame '+frame+'/'+FRAMES;
     setTimeout(captureNext,0);
   }
-  statusEl.textContent='Starting…';
+  statusEl.textContent='Loop: '+FRAMES+'f @ '+FPS+'fps ('+Math.round(FRAMES/FPS*10)/10+'s)…';
   setTimeout(captureNext,10);
+}
+
+// ── Speeds tab wiring ──
+const GOLDEN_PRESETS={
+  unison:  {circle:[1,1],dual:[1,1],  text1:[1,1],  text2:[1,1],  symbols:[1,1],sigil:[1,1]},
+  duplet:  {circle:[1,1],dual:[1,2],  text1:[1,2],  text2:[1,2],  symbols:[1,1],sigil:[1,2]},
+  triplet: {circle:[1,1],dual:[2,3],  text1:[1,3],  text2:[2,3],  symbols:[1,1],sigil:[1,3]},
+  quad:    {circle:[1,1],dual:[3,4],  text1:[1,2],  text2:[1,4],  symbols:[1,1],sigil:[1,4]},
+  sixth:   {circle:[1,1],dual:[2,3],  text1:[1,2],  text2:[1,3],  symbols:[1,1],sigil:[1,6]},
+  custom:  {circle:[1,1],dual:[1,1],  text1:[1,3],  text2:[1,3],  symbols:[1,1],sigil:[1,4]},
+};
+
+function findRatioIndex(arr){
+  // find closest match in SPEED_RATIOS
+  const dec=arr[1]===0?0:arr[0]/arr[1];
+  let best=8,bestDiff=999; // default to ×1
+  SPEED_RATIOS.forEach(([n,d,],i)=>{const v=d===0?0:n/d;const diff=Math.abs(v-dec);if(diff<bestDiff){bestDiff=diff;best=i;}});
+  return best;
+}
+
+function buildSpeedSelects(){
+  const keys=['circle','dual','text1','text2','symbols','sigil'];
+  const ids=['srCircle','srDual','srText1','srText2','srSymbols','srSigil'];
+  keys.forEach((key,ki)=>{
+    const sel=document.getElementById(ids[ki]);
+    if(!sel)return;
+    sel.innerHTML='';
+    SPEED_RATIOS.forEach(([n,d,label],i)=>{
+      const opt=document.createElement('option');
+      opt.value=i;opt.textContent=label;
+      sel.appendChild(opt);
+    });
+    sel.value=findRatioIndex(S.speeds[key]);
+    sel.addEventListener('change',()=>{
+      S.speeds[key]=SPEED_RATIOS[+sel.value];
+      updateLoopInfo();
+      if(!S.anim)render();
+    });
+  });
+  updateLoopInfo();
+}
+
+function updateLoopInfo(){
+  const sync=document.getElementById('loopSync').value;
+  try{
+    const animT=getFullLoopAnimT();
+    const f15=Math.min(9999,Math.round(animT/(S.speed*0.001*(60/15))));
+    const s15=Math.round(f15/15*10)/10;
+    const f30=Math.min(9999,Math.round(animT/(S.speed*0.001*(60/30))));
+    const s30=Math.round(f30/30*10)/10;
+    document.getElementById('loopInfoBox').innerHTML=
+      '<b style="color:#aaa">GIF:</b> '+f15+'f @ 15fps = '+s15+'s<br>'+
+      '<b style="color:#aaa">MP4:</b> '+f30+'f @ 30fps = '+s30+'s';
+  }catch(e){
+    document.getElementById('loopInfoBox').textContent='Loop: error';
+  }
+}
+
+function applyGolden(name){
+  const preset=GOLDEN_PRESETS[name];
+  if(!preset)return;
+  Object.assign(S.speeds,preset);
+  // Update all selects
+  const keys=['circle','dual','text1','text2','symbols','sigil'];
+  const ids=['srCircle','srDual','srText1','srText2','srSymbols','srSigil'];
+  keys.forEach((key,ki)=>{
+    const sel=document.getElementById(ids[ki]);
+    if(sel)sel.value=findRatioIndex(S.speeds[key]);
+  });
+  updateLoopInfo();
+  if(!S.anim)render();
 }
 
 // ── UI wiring ──
@@ -1321,8 +1954,23 @@ slider('tSymSize','symSize','vSymSize',v=>v+'px');
 slider('tSymR','symR','vSymR',v=>v+'%');
 // detail2 sliders
 slider('dNodeSz','nodeSz','vNodeSz',null,S.detail2);
+document.getElementById('dNodeSz').addEventListener('input',()=>{S.detail2.nodeSz=+document.getElementById('dNodeSz').value;document.getElementById('vNodeSz').textContent=S.detail2.nodeSz;if(!S.anim)render();});
+document.getElementById('dNodeStyle').addEventListener('change',e=>{S.detail2.nodeStyle=e.target.value;if(!S.anim)render();});
+document.getElementById('dNodeFill').addEventListener('change',e=>{S.detail2.nodeFill=e.target.checked;if(!S.anim)render();});
+document.getElementById('dNodeMul').addEventListener('input',()=>{S.detail2.nodeMul=+document.getElementById('dNodeMul').value;document.getElementById('vNodeMul').textContent='×'+S.detail2.nodeMul;if(!S.anim)render();});
+document.getElementById('dNodeOffset').addEventListener('input',()=>{S.detail2.nodeOffset=+document.getElementById('dNodeOffset').value;document.getElementById('vNodeOffset').textContent=S.detail2.nodeOffset+'°';if(!S.anim)render();});
+document.getElementById('dNodeOpacity').addEventListener('input',()=>{S.detail2.nodeOpacity=+document.getElementById('dNodeOpacity').value/100;document.getElementById('vNodeOpacity').textContent=document.getElementById('dNodeOpacity').value+'%';if(!S.anim)render();});
 slider('dTickMul','tickMul','vTickMul',v=>'x'+v,S.detail2);
 slider('dSpokeSkip','spokeSkip','vSpokeSkip',null,S.detail2);
+slider('dSpokeMul','spokeMul','vSpokeMul',null,S.detail2);
+document.getElementById('dSpokeMul').addEventListener('input',()=>{S.detail2.spokeMul=+document.getElementById('dSpokeMul').value;document.getElementById('vSpokeMul').textContent='×'+S.detail2.spokeMul;if(!S.anim)render();});
+slider('dSpokeInner','spokeInner','vSpokeInner',null,S.detail2);
+document.getElementById('dSpokeInner').addEventListener('input',()=>{S.detail2.spokeInner=+document.getElementById('dSpokeInner').value;document.getElementById('vSpokeInner').textContent=S.detail2.spokeInner+'%';if(!S.anim)render();});
+slider('dSpokeOuter','spokeOuter','vSpokeOuter',null,S.detail2);
+document.getElementById('dSpokeOuter').addEventListener('input',()=>{S.detail2.spokeOuter=+document.getElementById('dSpokeOuter').value;document.getElementById('vSpokeOuter').textContent=S.detail2.spokeOuter+'%';if(!S.anim)render();});
+slider('dSpokeOffset','spokeOffset','vSpokeOffset',null,S.detail2);
+document.getElementById('dSpokeOffset').addEventListener('input',()=>{S.detail2.spokeOffset=+document.getElementById('dSpokeOffset').value;document.getElementById('vSpokeOffset').textContent=S.detail2.spokeOffset+'°';if(!S.anim)render();});
+document.getElementById('dSpokeStyle').addEventListener('change',e=>{S.detail2.spokeStyle=e.target.value;if(!S.anim)render();});
 // detail2 checkboxes
 slider('dCenterPat','centerPat',null,null,S.detail2);
 document.getElementById('dCenterPat').addEventListener('input',()=>{S.detail2.centerPat=+document.getElementById('dCenterPat').value;if(!S.anim)render();});
@@ -1389,8 +2037,22 @@ document.getElementById('bPulse').addEventListener('click',()=>{
   else if(!S.anim)render();
 });
 document.getElementById('bMirror').addEventListener('click',()=>{S.mirror=!S.mirror;document.getElementById('bMirror').classList.toggle('on',S.mirror);if(!S.anim)render();});
+document.getElementById('bTransparent').addEventListener('click',()=>{
+  S.transparentBg=!S.transparentBg;
+  document.getElementById('bTransparent').classList.toggle('on',S.transparentBg);
+  document.getElementById('bTransparent').textContent=S.transparentBg?'Solid BG':'Transparent BG';
+  if(!S.anim)render();
+});
 document.getElementById('bSnap').addEventListener('click',exportPNG);
 document.getElementById('bSVG').addEventListener('click',exportSVG);
+document.getElementById('gifTranspMode').addEventListener('change',e=>{S.gifTranspMode=e.target.value;});
+document.getElementById('loopSync').addEventListener('change',()=>{
+  updateLoopInfo();
+  const f=Math.min(500,getLoopFrameCount(15));
+  const s=Math.round(f/15*10)/10;
+  document.getElementById('gifStatus').textContent='GIF: ~'+f+' frames ('+s+'s) | MP4: ~'+Math.min(3600,getLoopFrameCount(30))+' frames';
+  setTimeout(()=>{if(!gifWorking)document.getElementById('gifStatus').textContent='';},4000);
+});
 document.getElementById('bGIF').addEventListener('click',exportGIF);
 document.getElementById('bMP4').addEventListener('click',exportMP4);
 document.getElementById('bRandom').addEventListener('click',()=>{
@@ -1530,6 +2192,7 @@ function renderUserPresets(){
 }
 
 resize();
+buildSpeedSelects();
 render();
 </script>
 </body>
