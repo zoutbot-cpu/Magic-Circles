@@ -3,7 +3,7 @@
 A suite of interactive, browser-based occult geometry tools. No installation, no dependencies, no internet required — open any file and start creating.
 
 **[▶ Magic Circle Generator](https://zoutbot-cpu.github.io/Magic-Circles/)**  
-**[📱 Mobile Version](https://zoutbot-cpu.github.io/Magic-Circles/magic_circle_mobile.html)**  
+**[📱 Mobile Version](https://zoutbot-cpu.github.io/Magic-Circles/mobile.html)**  
 **[✦ Sigil Creator](https://zoutbot-cpu.github.io/Magic-Circles/sigil_creator.html)**
 
 ---
