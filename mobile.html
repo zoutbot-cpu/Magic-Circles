@@ -13,62 +13,86 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#000;color:#ccc;font-family:sans-serif;touch-action:manipulation}
 #canvasWrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
 canvas{display:block;max-width:100vmin;max-height:100vmin}
-#topbar{position:fixed;top:0;left:0;right:0;height:44px;display:flex;align-items:center;gap:8px;padding:0 12px;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid #1a1a1a}
-#styleSelect{flex:1;font-size:13px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:5px 8px;min-width:0}
-.topbtn{flex-shrink:0;font-size:12px;padding:5px 10px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;white-space:nowrap}
+
+/* top bar */
+#topbar{position:fixed;top:0;left:0;right:0;height:44px;display:flex;align-items:center;gap:6px;padding:0 10px;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;border-bottom:1px solid #1a1a1a}
+#styleSelect{flex:1;font-size:13px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:4px 6px;min-width:0}
+.topbtn{flex-shrink:0;font-size:13px;padding:5px 10px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;white-space:nowrap}
 .topbtn.on{background:#222;color:#fff;border-color:#555}
-#sheet{position:fixed;bottom:0;left:0;right:0;background:rgba(8,8,8,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #222;z-index:100;transition:transform .3s cubic-bezier(.4,0,.2,1);transform:translateY(calc(100% - 52px))}
-#sheet.open{transform:translateY(0)}
-#sheetHandle{height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
-.pill{width:36px;height:4px;background:#333;border-radius:2px}
-#sheetContent{padding:0 12px 24px;max-height:62vh;overflow-y:auto;overflow-x:hidden}
-#tabStrip{display:flex;gap:4px;padding:8px 0;overflow-x:auto;scrollbar-width:none}
-#tabStrip::-webkit-scrollbar{display:none}
-.stab{flex-shrink:0;font-size:12px;padding:5px 12px;background:#111;color:#777;border:1px solid #222;border-radius:16px;cursor:pointer;white-space:nowrap}
-.stab.active{background:#1e1e1e;color:#ddd;border-color:#444}
-.pane{display:none}.pane.active{display:block}
-.sh{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1px;margin:12px 0 5px}
-.srow{display:flex;align-items:center;gap:8px;margin-bottom:7px}
-.srow label{font-size:11px;color:#666;width:70px;flex-shrink:0}
+
+/* FABs */
+#fabs{position:fixed;right:10px;bottom:68px;display:flex;flex-direction:column;gap:8px;z-index:99}
+.fab{width:44px;height:44px;border-radius:22px;background:rgba(15,15,15,0.92);border:1px solid #2a2a2a;color:#888;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
+.fab.on{background:rgba(35,35,35,0.95);color:#ddd;border-color:#555}
+
+/* bottom nav bar */
+#bottomNav{position:fixed;bottom:0;left:0;right:0;height:52px;background:rgba(6,6,6,0.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #1a1a1a;display:flex;z-index:100}
+.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:#555;font-size:9px;text-transform:uppercase;letter-spacing:.5px;border:none;background:none;padding:4px 0}
+.navbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.navbtn.active{color:#ccc}
+.navbtn.active svg{stroke:#ccc}
+
+/* drawer */
+#drawer{position:fixed;bottom:52px;left:0;right:0;background:rgba(8,8,8,0.98);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid #1e1e1e;z-index:99;transition:transform .28s cubic-bezier(.4,0,.2,1);transform:translateY(100%);max-height:65vh;display:flex;flex-direction:column}
+#drawer.open{transform:translateY(0)}
+#drawerHandle{height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.pill{width:32px;height:3px;background:#2a2a2a;border-radius:2px}
+#drawerContent{overflow-y:auto;overflow-x:hidden;padding:0 14px 16px;flex:1}
+
+/* section groups inside drawer */
+.dsec{margin-bottom:14px}
+.dsec-h{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.dsec-h span{color:#666;font-size:10px;cursor:pointer}
+
+/* controls */
+.srow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.srow label{font-size:11px;color:#666;width:80px;flex-shrink:0}
 .srow input[type=range]{flex:1;min-width:0}
-.sv{font-size:11px;color:#aaa;width:30px;text-align:right;flex-shrink:0}
-.trow{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #0e0e0e}
-.trow label{font-size:12px;color:#888}
-.toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.knob{position:absolute;inset:0;background:#222;border-radius:11px;transition:.2s}
-.knob:before{content:'';position:absolute;height:16px;width:16px;left:3px;top:3px;background:#555;border-radius:50%;transition:.2s}
-.toggle input:checked+.knob{background:#2a2a2a}
-.toggle input:checked+.knob:before{transform:translateX(18px);background:#ccc}
-.cgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:8px}
-.csw{width:100%;aspect-ratio:1;border-radius:4px;cursor:pointer;border:2px solid transparent}
+.sv{font-size:11px;color:#aaa;width:32px;text-align:right;flex-shrink:0}
+.crow{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0d0d0d}
+.crow label{font-size:12px;color:#777}
+/* toggle */
+.tog{position:relative;width:36px;height:20px;flex-shrink:0;cursor:pointer}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.knob{position:absolute;inset:0;background:#1e1e1e;border-radius:10px;transition:.2s}
+.knob:before{content:'';position:absolute;height:14px;width:14px;left:3px;top:3px;background:#444;border-radius:50%;transition:.2s}
+.tog input:checked+.knob{background:#252525}
+.tog input:checked+.knob:before{transform:translateX(16px);background:#bbb}
+/* colour grid */
+.cgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-bottom:8px}
+.csw{width:100%;aspect-ratio:1;border-radius:3px;cursor:pointer;border:2px solid transparent}
 .csw.sel{border-color:#fff}
-#mSymGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-height:150px;overflow-y:auto}
-.msym{font-size:18px;text-align:center;padding:3px;cursor:pointer;border-radius:3px;border:1px solid transparent;line-height:1.4}
+/* symbol grid */
+#mSymGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;max-height:130px;overflow-y:auto;margin-bottom:8px}
+.msym{font-size:17px;text-align:center;padding:3px;cursor:pointer;border-radius:3px;border:1px solid transparent;line-height:1.4}
 .msym.sel{background:#1a1a1a;border-color:#333}
-.egrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.ebtn{padding:10px;font-size:13px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:8px;cursor:pointer;text-align:center}
-.ebtn:active{background:#1a1a1a}
-.qrow{display:flex;gap:8px;margin-bottom:8px;align-items:center}
-.qrow label{font-size:11px;color:#666;white-space:nowrap;width:72px;flex-shrink:0}
-.qrow select{flex:1;min-width:0;font-size:12px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:5px 6px}
-#mStatus{font-size:11px;color:#888;text-align:center;padding:6px 0;min-height:22px}
-.plist{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.pbtn{font-size:11px;padding:8px 6px;background:#111;color:#888;border:1px solid #1a1a1a;border-radius:6px;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pbtn:active{background:#1a1a1a;color:#ddd}
-#fabs{position:fixed;right:12px;bottom:64px;display:flex;flex-direction:column;gap:8px;z-index:99}
-.fab{width:46px;height:46px;border-radius:23px;background:rgba(18,18,18,0.92);border:1px solid #2a2a2a;color:#888;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px)}
-.fab.on{background:rgba(40,40,40,0.95);color:#ddd;border-color:#555}
-input[type=text]{width:100%;font-size:12px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px;padding:6px;margin-bottom:6px}
-input[type=color]{width:100%;height:32px;background:#111;border:1px solid #2a2a2a;border-radius:6px;cursor:pointer;margin-bottom:8px}
-select{background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px}
+/* preset grid */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.pbtn{font-size:11px;padding:7px 6px;background:#0e0e0e;color:#777;border:1px solid #1a1a1a;border-radius:5px;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbtn:active,.pbtn:hover{background:#161616;color:#ccc}
+/* golden preset buttons */
+.gbtn{font-size:11px;padding:6px;background:#0e0e0e;color:#777;border:1px solid #1a1a1a;border-radius:5px;cursor:pointer;text-align:center}
+.gbtn:active{background:#161616;color:#ccc}
+/* speed selects */
+.speed-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid #0d0d0d}
+.speed-row label{font-size:11px;color:#666}
+.speed-sel{font-size:11px;background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:4px;padding:3px 5px}
+/* export */
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px}
+.ebtn{padding:9px;font-size:12px;background:#0e0e0e;color:#888;border:1px solid #1a1a1a;border-radius:7px;cursor:pointer;text-align:center}
+.ebtn:active{background:#161616}
+select,input[type=text],input[type=color]{background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:5px}
+input[type=text]{width:100%;padding:6px;font-size:12px;margin-bottom:6px}
+input[type=color]{width:100%;height:30px;cursor:pointer;margin-bottom:8px}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:#0a0a0a}::-webkit-scrollbar-thumb{background:#1e1e1e;border-radius:2px}
 </style>
 </head>
 <body>
+
 <div id="canvasWrap"><canvas id="c"></canvas></div>
 
+<!-- Top bar -->
 <div id="topbar">
-  <p>Slightly Outdated, will update soon</p>
   <select id="styleSelect">
     <option value="star">Star polygon</option><option value="orbital">Orbital</option>
     <option value="alchemic">Alchemic</option><option value="pentagram">Pentagram</option>
@@ -84,145 +108,75 @@ select{background:#111;color:#ccc;border:1px solid #2a2a2a;border-radius:6px}
   <button class="topbtn" id="mRandBtn">🎲</button>
 </div>
 
+<!-- FABs -->
 <div id="fabs">
   <div class="fab" id="fabPulse" title="Pulse">〇</div>
   <div class="fab" id="fabDual" title="Dual">⊕</div>
+  <div class="fab" id="fabMirror" title="Mirror">⧉</div>
   <div class="fab" id="fabSparks" title="Sparks">✦</div>
 </div>
 
-<div id="sheet">
-  <div id="sheetHandle"><div class="pill"></div></div>
-  <div id="sheetContent">
-    <div id="tabStrip">
-      <div class="stab active" data-pane="sliders">Adjust</div>
-      <div class="stab" data-pane="color">Color</div>
-      <div class="stab" data-pane="symbols">Symbols</div>
-      <div class="stab" data-pane="text">Text</div>
-      <div class="stab" data-pane="layers">Layers</div>
-      <div class="stab" data-pane="presets">Presets</div>
-      <div class="stab" data-pane="export">Export</div>
-    </div>
+<!-- Drawer -->
+<div id="drawer">
+  <div id="drawerHandle"><div class="pill"></div></div>
+  <div id="drawerContent"></div>
+</div>
 
-    <div class="pane active" id="pane-sliders">
-      <div class="srow"><label>Points</label><input type="range" id="mPts" min="3" max="16" value="6"><span class="sv" id="mvPts">6</span></div>
-      <div class="srow"><label>Rings</label><input type="range" id="mRings" min="1" max="8" value="3"><span class="sv" id="mvRings">3</span></div>
-      <div class="srow"><label>Detail</label><input type="range" id="mDetail" min="1" max="5" value="3"><span class="sv" id="mvDetail">3</span></div>
-      <div class="srow"><label>Center pat.</label><input type="range" id="mCenterPat" min="0" max="4" value="0"><span class="sv" id="mvCenterPat">0</span></div>
-      <div class="srow"><label>Scale</label><input type="range" id="mScale" min="40" max="130" value="100"><span class="sv" id="mvScale">100</span></div>
-      <div class="srow"><label>Line</label><input type="range" id="mLW" min="2" max="40" value="12"><span class="sv" id="mvLW">1.2</span></div>
-      <div class="srow"><label>Glow</label><input type="range" id="mGlow" min="0" max="50" value="16"><span class="sv" id="mvGlow">16</span></div>
-      <div class="srow"><label>Opacity</label><input type="range" id="mOpacity" min="10" max="100" value="100"><span class="sv" id="mvOpacity">100%</span></div>
-      <div class="srow"><label>Rotate</label><input type="range" id="mRot" min="0" max="360" value="0"><span class="sv" id="mvRot">0°</span></div>
-      <div class="srow"><label>Speed</label><input type="range" id="mSpeed" min="1" max="30" value="5"><span class="sv" id="mvSpeed">5</span></div>
-      <div class="sh">Detail</div>
-      <div class="trow"><label>Cross lines</label><label class="toggle"><input type="checkbox" id="mdCross" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Double ring</label><label class="toggle"><input type="checkbox" id="mdDouble" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Dashed ring</label><label class="toggle"><input type="checkbox" id="mdDash"><span class="knob"></span></label></div>
-      <div class="trow"><label>Node rings</label><label class="toggle"><input type="checkbox" id="mdNodeRings" checked><span class="knob"></span></label></div>
-      <div class="srow" style="margin-top:8px"><label>Node size</label><input type="range" id="mdNodeSz" min="2" max="20" value="6"><span class="sv" id="mvNodeSz">6</span></div>
-      <div class="srow"><label>Tick mult.</label><input type="range" id="mdTickMul" min="1" max="6" value="2"><span class="sv" id="mvTickMul">x2</span></div>
-      <div class="srow"><label>Spoke skip</label><input type="range" id="mdSpokeSkip" min="1" max="4" value="1"><span class="sv" id="mvSpokeSkip">1</span></div>
-    </div>
-
-    <div class="pane" id="pane-color">
-      <div class="sh">Stroke color</div>
-      <div class="cgrid" id="mSwColor"></div>
-      <input type="color" id="mCustomColor" value="#FFD700">
-      <div class="sh">Background</div>
-      <div class="cgrid" id="mSwBg"></div>
-      <input type="color" id="mCustomBg" value="#000000">
-      <div class="sh">Second color (dual)</div>
-      <div class="cgrid" id="mSwColor2"></div>
-    </div>
-
-    <div class="pane" id="pane-symbols">
-      <select id="mSymSet" style="width:100%;padding:6px;margin-bottom:8px">
-        <option value="alchemic">Alchemical</option><option value="astro">Astrological</option>
-        <option value="futhark">Elder Futhark</option><option value="greek">Greek</option>
-        <option value="geo">Geometric</option><option value="occult">Occult</option>
-        <option value="latin">Latin</option><option value="arabic">Arabic</option>
-      </select>
-      <div id="mSymGrid"></div>
-      <div class="sh">Selected</div>
-      <div id="mSelSyms" style="font-size:20px;min-height:32px;background:#111;border:1px solid #2a2a2a;border-radius:6px;padding:6px;letter-spacing:3px;margin-bottom:6px"></div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="ebtn" style="flex:1" onclick="mClearSyms()">Clear</button>
-        <button class="ebtn" style="flex:1" onclick="mApplySyms()">Apply ↗</button>
-      </div>
-      <div class="srow"><label>Size</label><input type="range" id="mSymSize" min="8" max="40" value="16"><span class="sv" id="mvSymSize">16</span></div>
-      <div class="srow"><label>Radius</label><input type="range" id="mSymR" min="60" max="130" value="100"><span class="sv" id="mvSymR">100%</span></div>
-    </div>
-
-    <div class="pane" id="pane-text">
-      <div class="sh">Ring 1</div>
-      <input type="text" id="mtr1" value="🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇">
-      <div class="srow"><label>Radius</label><input type="range" id="mtr1R" min="50" max="140" value="108"><span class="sv" id="mvtr1R">108</span></div>
-      <div class="srow"><label>Size</label><input type="range" id="mtr1S" min="8" max="32" value="13"><span class="sv" id="mvtr1S">13</span></div>
-      <div class="srow"><label>Spacing</label><input type="range" id="mtr1Sp" min="1" max="40" value="14"><span class="sv" id="mvtr1Sp">14</span></div>
-      <div class="trow"><label>Flip</label><label class="toggle"><input type="checkbox" id="mtr1Flip"><span class="knob"></span></label></div>
-      <div class="sh">Ring 2</div>
-      <input type="text" id="mtr2" value="ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ">
-      <div class="srow"><label>Radius</label><input type="range" id="mtr2R" min="50" max="140" value="92"><span class="sv" id="mvtr2R">92</span></div>
-      <div class="srow"><label>Size</label><input type="range" id="mtr2S" min="8" max="32" value="11"><span class="sv" id="mvtr2S">11</span></div>
-      <div class="srow"><label>Spacing</label><input type="range" id="mtr2Sp" min="1" max="40" value="12"><span class="sv" id="mvtr2Sp">12</span></div>
-      <div class="trow"><label>Flip</label><label class="toggle"><input type="checkbox" id="mtr2Flip" checked><span class="knob"></span></label></div>
-      <div class="sh">Center inscription</div>
-      <input type="text" id="mtr3" placeholder="Center text…">
-      <div class="srow"><label>Size</label><input type="range" id="mtr3S" min="8" max="48" value="20"><span class="sv" id="mvtr3S">20</span></div>
-    </div>
-
-    <div class="pane" id="pane-layers">
-      <div class="trow"><label>Outer rings</label><label class="toggle"><input type="checkbox" id="mlOuter" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Inner rings</label><label class="toggle"><input type="checkbox" id="mlInner" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Geometry</label><label class="toggle"><input type="checkbox" id="mlGeom" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Nodes</label><label class="toggle"><input type="checkbox" id="mlNodes" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Spokes</label><label class="toggle"><input type="checkbox" id="mlSpokes" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Tick marks</label><label class="toggle"><input type="checkbox" id="mlTicks" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Center core</label><label class="toggle"><input type="checkbox" id="mlCenter" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Symbols</label><label class="toggle"><input type="checkbox" id="mlSymbols" checked><span class="knob"></span></label></div>
-      <div class="trow"><label>Text rings</label><label class="toggle"><input type="checkbox" id="mlTextRings" checked><span class="knob"></span></label></div>
-    </div>
-
-    <div class="pane" id="pane-presets">
-      <div class="sh">Built-in</div>
-      <div class="plist" id="mPresetList"></div>
-      <div class="sh" style="margin-top:10px">Save current</div>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="mPresetName" placeholder="Name…" style="margin-bottom:0">
-        <button class="ebtn" style="flex-shrink:0;padding:6px 12px" onclick="mSavePreset()">Save</button>
-      </div>
-      <div class="plist" id="mUserPresets" style="margin-top:8px"></div>
-    </div>
-
-    <div class="pane" id="pane-export">
-      <div class="qrow"><label>Quality</label><select id="meQuality"><option value="low">Low 240px</option><option value="med" selected>Med 360px</option><option value="high">High 480px</option><option value="ultra">Ultra 720px</option></select></div>
-      <div class="qrow"><label>GIF frames</label><select id="meFrames"><option value="30">30 (1.5s)</option><option value="60" selected>60 (3s)</option><option value="90">90 (4.5s)</option><option value="120">120 (6s)</option></select></div>
-      <div class="egrid">
-        <button class="ebtn" onclick="mExportPNG()">📷 PNG</button>
-        <button class="ebtn" onclick="mExportSVG()">⬡ SVG</button>
-        <button class="ebtn" onclick="mExportGIF()">🎞 GIF</button>
-        <button class="ebtn" onclick="mExportMP4()">🎬 MP4</button>
-      </div>
-      <div id="mStatus"></div>
-    </div>
-  </div>
+<!-- Bottom nav -->
+<div id="bottomNav">
+  <button class="navbtn active" data-panel="adjust">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Adjust
+  </button>
+  <button class="navbtn" data-panel="color">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18"/></svg>Color
+  </button>
+  <button class="navbtn" data-panel="detail">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3m0 12v3M3 12h3m12 0h3"/></svg>Detail
+  </button>
+  <button class="navbtn" data-panel="sigil">
+    <svg viewBox="0 0 24 24"><path d="M12 3l3 6 6 1-4.5 4 1 6L12 17l-5.5 3 1-6L3 10l6-1z"/></svg>Sigil
+  </button>
+  <button class="navbtn" data-panel="text">
+    <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h10M4 17h13"/></svg>Text
+  </button>
+  <button class="navbtn" data-panel="speeds">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Speeds
+  </button>
+  <button class="navbtn" data-panel="export">
+    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export
+  </button>
 </div>
 
 <script>
-// ── Symbol & colour data ──
+// ── Data ──
 const SYM_SETS={
   alchemic:['🜀','🜁','🜂','🜃','🜄','🜅','🜆','🜇','🜈','🜉','🜊','🜋','🜌','🜍','🜎','🜏','🜐','🜑','🜒','🜓','🜔','🜕','🜖','🜗','🜘','🜙','🜚','🜛','🜜','🜝','🜞','🜟','🜠','🜡','🜢','🜣','🜤','🜥','🜦','🜧','🜨','🜩','🜪','🜫','🜬','🜭','🜮','🜯','🜰','🜱','🜲','🜳','🜴','🜵','🜶','🜷','🜸','🜹','🜺','🜻','🜼','🜽','🜾','🜿'],
   astro:['☉','☽','☿','♀','♁','♂','♃','♄','♅','♆','♇','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','★','☆','✦','✧','⊕','⊗','⊙'],
   futhark:['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'],
   greek:['Α','Β','Γ','Δ','Ε','Ζ','Η','Θ','Ι','Κ','Λ','Μ','Ν','Ξ','Ο','Π','Ρ','Σ','Τ','Υ','Φ','Χ','Ψ','Ω','α','β','γ','δ','ε','ζ','η','θ'],
   geo:['◈','◇','◆','◎','⊛','⊜','⊝','⊞','⊟','⊠','⊡','▲','△','▽','▼','◁','▷','◯','⬡','⬢','⬣','✦','✧','✩','✪','✫','✬','✭','✮','✯','✰'],
-  occult:['☽','☾','⛤','⛧','✡','☸','☯','☩','☦','✝','♾','⚕','⚚','⚜','⚝','⚠','⚡','⚢','⚣','⚤','⚥','⚦','⚧','⚨','⚩','⛎','⚬','⚭','⚮'],
+  occult:['☽','☾','⛤','⛧','✡','☸','☯','☩','☦','✝','♾','⚕','⚚','⚜','⚝','⚞','⚟','⚠','⚡','⚢','⚣','⚤','⚥','⚦','⚧','⚨','⚩','⛎','⚬','⚭','⚮'],
   latin:'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),
   arabic:['ا','ب','ت','ث','ج','ح','خ','د','ذ','ر','ز','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ك','ل','م','ن','ه','و','ي'],
+  custom:[]
 };
-const COLS={gold:'#FFD700',silver:'#D0D0D0',cyan:'#00FFFF',rose:'#FF69B4',emerald:'#00FF88',purple:'#BB88FF',crimson:'#FF3333',azure:'#4488FF',amber:'#FFAA00',white:'#FFFFFF',teal:'#00CCBB',lime:'#AAFF00'};
-const GLOWS={gold:'#AA6600',silver:'#808080',cyan:'#006688',rose:'#880044',emerald:'#006622',purple:'#440088',crimson:'#660000',azure:'#001188',amber:'#884400',white:'#888888',teal:'#005544',lime:'#448800'};
+
+let selectedSymbols=[];
+
+// ── color palettes ──
+const COLS={
+  gold:'#FFD700',silver:'#D0D0D0',cyan:'#00FFFF',rose:'#FF69B4',
+  emerald:'#00FF88',purple:'#BB88FF',crimson:'#FF3333',azure:'#4488FF',
+  amber:'#FFAA00',white:'#FFFFFF',teal:'#00CCBB',lime:'#AAFF00'
+};
+const GLOWS={
+  gold:'#AA6600',silver:'#808080',cyan:'#006688',rose:'#880044',
+  emerald:'#006622',purple:'#440088',crimson:'#660000',azure:'#001188',
+  amber:'#884400',white:'#888888',teal:'#005544',lime:'#448800'
+};
 const BGS={'#000000':'Black','#070010':'Deep void','#000820':'Night sea','#100008':'Blood dark','#081000':'Forest','#0d0900':'Parchment','#1a1a2e':'Midnight'};
+
+// ── state ──
 
 // ── Canvas ──
 const CV=document.getElementById('c');
@@ -240,6 +194,7 @@ let S={
   style:'star',pts:6,rings:3,detail:3,scale:100,lw:1.2,glow:16,opacity:1,rotate:0,speed:5,
   color:'#FFD700',glow2:'#AA6600',color2:'#BB88FF',bg:'#000000',
   anim:false,sparks:false,dual:false,pulse:false,mirror:false,
+  transparentBg:false,gifTranspMode:'none',
   symSize:16,symR:100,symbols:[],
   tr:[
     {text:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',r:108,s:13,sp:14,off:0,flip:false},
@@ -247,11 +202,17 @@ let S={
     {text:'',s:20,y:0}
   ],
   layers:{outer:true,inner:true,geom:true,nodes:true,spokes:true,ticks:true,center:true,symbols:true,textRings:true,sparks:true},
-  detail2:{cross:true,double:true,dash:false,starFill:false,nodeRings:true,nodeSz:6,tickMul:2,spokeSkip:1,centerPat:0}
+  detail2:{cross:true,double:true,dash:false,starFill:false,nodeRings:true,nodeSz:6,tickMul:2,
+            spokeSkip:1,centerPat:0,spokeInner:5,spokeOuter:95,spokeMul:1,spokeStyle:'solid',spokeOffset:0,
+            nodeStyle:'circle',nodeFill:false,nodeOffset:0,nodeMul:1,nodeOpacity:1.0},
+  speeds:{circle:[1,1],dual:[1,1],text1:[1,3],text2:[1,3],symbols:[1,1],sigil:[1,4]},
+  sigil:{active:false,intention:'',reduction:'dupes',grid:'circle',lineStyle:'bezier',
+          terminal:'dot',smooth:0.4,scale:70,rotate:0,opacity:0.7,weight:1.0,
+          blendMode:'normal',syncPts:false,letters:[],color:'same',symmetry:6,offsetR:0.75}
 };
 let animId=null,animT=0,t=0,sparks=[];
 
-// ── Drawing engine (shared with desktop) ──
+// ── Drawing engine ──
 const TAU=Math.PI*2;
 function W(){return CV.width}function H(){return CV.height}function cx(){return W()/2}function cy(){return H()/2}
 function baseR(){return Math.min(W(),H())*0.43*S.scale/100}
@@ -274,7 +235,38 @@ function ss(a=1,c=null){
   ctx.lineWidth=S.lw;
 }
 function circ(x,y,r){ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.stroke();}
-function miniCircs(r,n,sr,rot){for(let i=0;i<n;i++){const a=rot+i*TAU/n;circ(cx()+r*Math.cos(a),cy()+r*Math.sin(a),sr);}}
+function miniCircs(r,n,sr,rot){
+  const D=S.detail2;
+  const total=n*(D.nodeMul||1);
+  const offsetRad=(D.nodeOffset||0)*Math.PI/180;
+  const savedAlpha=ctx.globalAlpha;
+  ctx.globalAlpha=savedAlpha*(D.nodeOpacity||1);
+  for(let i=0;i<total;i++){
+    const a=rot+offsetRad+i*TAU/total;
+    const nx=cx()+r*Math.cos(a),ny=cy()+r*Math.sin(a);
+    const style=D.nodeStyle||'circle';
+    ctx.beginPath();
+    if(style==='circle'){
+      ctx.arc(nx,ny,sr,0,Math.PI*2);
+    } else if(style==='square'){
+      ctx.rect(nx-sr,ny-sr,sr*2,sr*2);
+    } else if(style==='diamond'){
+      ctx.moveTo(nx,ny-sr*1.4);ctx.lineTo(nx+sr,ny);ctx.lineTo(nx,ny+sr*1.4);ctx.lineTo(nx-sr,ny);ctx.closePath();
+    } else if(style==='cross'){
+      ctx.moveTo(nx-sr,ny);ctx.lineTo(nx+sr,ny);ctx.moveTo(nx,ny-sr);ctx.lineTo(nx,ny+sr);
+    } else if(style==='triangle'){
+      ctx.moveTo(nx,ny-sr*1.3);ctx.lineTo(nx+sr*1.1,ny+sr*0.8);ctx.lineTo(nx-sr*1.1,ny+sr*0.8);ctx.closePath();
+    }
+    if(style==='cross'){
+      ctx.stroke();
+    } else if(D.nodeFill){
+      ctx.fill();ctx.stroke();
+    } else {
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha=savedAlpha;
+}
 function starPoly(r,n,skip,rot){
   const pts=[];for(let i=0;i<n;i++)pts.push([cx()+r*Math.cos(rot+i*TAU/n),cy()+r*Math.sin(rot+i*TAU/n)]);
   ctx.beginPath();for(let i=0;i<n;i++){const[x,y]=pts[(i*skip)%n];i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}ctx.closePath();ctx.stroke();
@@ -286,8 +278,40 @@ function tickMarks(r,n,len,rot){
 }
 function spokeDraw(r1,r2,n,rot){
   if(!S.layers.spokes)return;
-  const sk=S.detail2.spokeSkip;
-  for(let i=0;i<n;i+=sk){const a=rot+i*TAU/n;ctx.beginPath();ctx.moveTo(cx()+r1*Math.cos(a),cy()+r1*Math.sin(a));ctx.lineTo(cx()+r2*Math.cos(a),cy()+r2*Math.sin(a));ctx.stroke();}
+  const D=S.detail2,sk=D.spokeSkip;
+  // Apply inner/outer radius overrides as fraction of the passed-in r1/r2
+  const ri=r1+(r2-r1)*(D.spokeInner/100);
+  const ro=r1+(r2-r1)*(D.spokeOuter/100);
+  const offsetRad=(D.spokeOffset||0)*Math.PI/180;
+  const total=n*(D.spokeMul||1);
+  const savedLW=ctx.lineWidth;
+  for(let i=0;i<total;i+=sk){
+    const a=rot+offsetRad+i*TAU/total;
+    ctx.beginPath();
+    if(D.spokeStyle==='tapered'){
+      // tapered: wide at outer, narrow at inner using quadratic trick
+      ctx.lineWidth=savedLW*0.3;
+    } else if(D.spokeStyle==='dashed'){
+      ctx.setLineDash([6,5]);
+    } else if(D.spokeStyle==='dotted'){
+      ctx.setLineDash([2,6]);
+    }
+    ctx.moveTo(cx()+ri*Math.cos(a),cy()+ri*Math.sin(a));
+    ctx.lineTo(cx()+ro*Math.cos(a),cy()+ro*Math.sin(a));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineWidth=savedLW;
+    // Tapered: draw second wider line over outer 40%
+    if(D.spokeStyle==='tapered'){
+      const midR=ri+(ro-ri)*0.6;
+      ctx.lineWidth=savedLW*1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx()+midR*Math.cos(a),cy()+midR*Math.sin(a));
+      ctx.lineTo(cx()+ro*Math.cos(a),cy()+ro*Math.sin(a));
+      ctx.stroke();
+      ctx.lineWidth=savedLW;
+    }
+  }
 }
 function polyN(r,rot,sides){
   ctx.save();ctx.translate(cx(),cy());ctx.rotate(rot);
@@ -532,19 +556,21 @@ function drawStyle(style,R,rot,er,alpha=1,useCol2=false){
     drawCenterFor('rose',R,r2);
   }
   else if(style==='enochian'){
-    circ(cx(),cy(),R);
+    if(L.outer)circ(cx(),cy(),R);
     const tables=4,sq=R*0.55;
-    for(let i=0;i<tables;i++){
-      const a=r2+i*TAU/tables;
-      ctx.save();ctx.translate(cx()+R*0.45*Math.cos(a),cy()+R*0.45*Math.sin(a));ctx.rotate(a);
-      ctx.strokeRect(-sq*0.28,-sq*0.28,sq*0.56,sq*0.56);
-      if(d>2){ctx.beginPath();ctx.moveTo(-sq*0.28,0);ctx.lineTo(sq*0.28,0);ctx.moveTo(0,-sq*0.28);ctx.lineTo(0,sq*0.28);ctx.stroke();}
-      ctx.restore();
+    if(L.geom){
+      for(let i=0;i<tables;i++){
+        const a=r2+i*TAU/tables;
+        ctx.save();ctx.translate(cx()+R*0.45*Math.cos(a),cy()+R*0.45*Math.sin(a));ctx.rotate(a);
+        ctx.strokeRect(-sq*0.28,-sq*0.28,sq*0.56,sq*0.56);
+        if(d>2){ctx.beginPath();ctx.moveTo(-sq*0.28,0);ctx.lineTo(sq*0.28,0);ctx.moveTo(0,-sq*0.28);ctx.lineTo(0,sq*0.28);ctx.stroke();}
+        ctx.restore();
+      }
+      starPoly(R*0.52,tables*2,2,r2+Math.PI/tables);
     }
-    starPoly(R*0.52,tables*2,2,r2+Math.PI/tables);
-    circ(cx(),cy(),R*0.22);
-    if(d>1)spokeDraw(R*0.22,R*0.65,tables*2,r2);
-    if(d>3){miniCircs(R,n,D.nodeSz,r2);tickMarks(R*0.97,n*3,6,r2);}
+    if(L.inner)circ(cx(),cy(),R*0.22);
+    if(d>1&&L.spokes)spokeDraw(R*0.22,R*0.65,tables*2,r2);
+    if(d>3){if(L.nodes)miniCircs(R,n,D.nodeSz,r2);if(L.ticks)tickMarks(R*0.97,n*3,6,r2);}
     drawCenterFor('enochian',R,r2);
   }
 
@@ -641,7 +667,7 @@ function drawStyle(style,R,rot,er,alpha=1,useCol2=false){
     for(let i=0;i<seg;i++){
       const a=r2+i*TAU/seg;
       // dividing spokes
-      if(L.spokes){
+      if(L.geom&&L.spokes){
         const sk=S.detail2.spokeSkip;
         if(i%sk===0){ctx.beginPath();ctx.moveTo(cx()+R*0.35*Math.cos(a),cy()+R*0.35*Math.sin(a));ctx.lineTo(cx()+R*0.97*Math.cos(a),cy()+R*0.97*Math.sin(a));ctx.stroke();}
       }
@@ -838,7 +864,7 @@ function drawSymbols(extraRot){
   if(!S.layers.symbols||!S.symbols.length)return;
   const syms=S.symbols;
   const R=baseR()*S.symR/100;
-  const rot=S.rotate*Math.PI/180+extraRot;
+  const rot=S.rotate*Math.PI/180+extraRot*speedOf('symbols');
   ctx.save();
   ctx.font=`${S.symSize}px serif`;
   ctx.fillStyle=col(0.85);
@@ -872,37 +898,50 @@ function updateSparks(){
   }
 }
 
+// ── Speed ratio system ──
+// All ratios available in the dropdowns: [num, den, label]
+const SPEED_RATIOS=[
+  [0,1,'0 (still)'],[1,6,'1/6'],[1,5,'1/5'],[1,4,'1/4'],[1,3,'1/3'],[1,2,'1/2'],
+  [2,3,'2/3'],[3,4,'3/4'],[1,1,'1×'],[4,3,'4/3'],[3,2,'3/2'],[2,1,'2×'],[3,1,'3×']
+];
+function ratioToDecimal(r){return r[1]===0?0:r[0]/r[1];}
+function ratioFrac(r){return [r[0],r[1]];}  // [num,den] for LCM calc
+function speedOf(key){return ratioToDecimal(S.speeds[key]);}
+
 // ── main draw ──
 function draw(extraRot){
   const cw=W(),ch=H();
   ctx.clearRect(0,0,cw,ch);
-  ctx.fillStyle=S.bg;ctx.fillRect(0,0,cw,ch);
+  if(!S.transparentBg){ctx.fillStyle=S.bg;ctx.fillRect(0,0,cw,ch);}
   const R=baseR(),rot=S.rotate*Math.PI/180;
   const tr=S.tr;
 
   if(S.mirror){
     ctx.save();ctx.scale(-1,1);ctx.translate(-cw,0);
     ctx.globalAlpha=0.35;
-    drawStyle(S.style,R,rot,extraRot);
+    drawStyle(S.style,R,rot,extraRot*speedOf('circle'));
     ctx.restore();ctx.globalAlpha=1;
   }
   if(S.dual){
     ctx.globalAlpha=0.4;
-    drawStyle(S.style,R*0.82,rot+Math.PI/S.pts,-extraRot*1.2,0.6,true);
+    drawStyle(S.style,R*0.82,rot+Math.PI/S.pts,-extraRot*speedOf('dual'),0.6,true);
     ctx.globalAlpha=1;
   }
 
   let drawR=R;
   if(S.pulse){const ps=1+0.045*Math.sin(t*3);ctx.save();ctx.translate(cx(),cy());ctx.scale(ps,ps);ctx.translate(-cx(),-cy());drawR=R;}
 
-  drawStyle(S.style,drawR,rot,extraRot);
+  drawStyle(S.style,drawR,rot,extraRot*speedOf('circle'));
   if(S.pulse)ctx.restore();
+  // Draw embedded sigil layer (always draws when active, regardless of geom layer)
+  drawSigilOnCanvas(extraRot);
 
   // text rings
   if(S.layers.textRings){
-    const animO=extraRot*0.3;
-    drawTextRing(tr[0].text,tr[0].r,tr[0].s,tr[0].sp,tr[0].off,tr[0].flip,animO);
-    drawTextRing(tr[1].text,tr[1].r,tr[1].s,tr[1].sp,tr[1].off,tr[1].flip,-animO*1.3);
+    const animO1=extraRot*speedOf('text1');
+    const animO2=extraRot*speedOf('text2');
+    drawTextRing(tr[0].text,tr[0].r,tr[0].s,tr[0].sp,tr[0].off,tr[0].flip,animO1);
+    drawTextRing(tr[1].text,tr[1].r,tr[1].s,tr[1].sp,tr[1].off,tr[1].flip,-animO2);
     drawCenterText(tr[2].text,tr[2].s,tr[2].y);
   }
 
@@ -910,7 +949,202 @@ function draw(extraRot){
   updateSparks();
 }
 
+// ══════════════════════════════════════════════
+// ── SYMMETRIC SIGIL ENGINE ──
+// ══════════════════════════════════════════════
 
+const VOWELS_S=new Set('AEIOU');
+function sigilProcessLetters(text,mode){
+  const upper=text.toUpperCase().replace(/[^A-Z]/g,'');
+  if(mode==='none')return[...upper];
+  const seen=new Set(),out=[];
+  for(const ch of upper){
+    if(seen.has(ch))continue;
+    if(mode==='dupvow'&&VOWELS_S.has(ch))continue;
+    seen.add(ch);out.push(ch);
+  }
+  return out;
+}
+
+function sigilSeededRand(seed){let s=seed|0;return()=>{s=(s*1664525+1013904223)&0xffffffff;return(s>>>0)/0xffffffff;};}
+
+// ── Map letters to angles on a circle ──
+// Each letter gets a fixed angle on the ring; the sigil path connects them in order.
+// Symmetry is achieved by ROTATING a copy of the full path by 360/symmetry degrees
+// and drawing all copies — like a kaleidoscope.
+function sigilLetterAngles(letters, symmetry, R, seed, gridType){
+  const TAU=Math.PI*2;
+  const rand=sigilSeededRand(seed);
+  const angles={};
+  const alpha='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  if(gridType==='circle'){
+    // Letters evenly spaced: A at 0, B at 1/26, etc.
+    for(let i=0;i<26;i++) angles[alpha[i]]=((i/26)*TAU)-Math.PI/2;
+  } else if(gridType==='wheel'){
+    // Numerology: 9 positions, letters cluster at their number
+    const num={A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+    // Spread letters sharing a number slightly so they don't pile up
+    const counts={};
+    const result={};
+    for(const ch of alpha){
+      const n=num[ch];
+      counts[n]=(counts[n]||0)+1;
+    }
+    const placed={};
+    for(const ch of alpha){
+      const n=num[ch];
+      placed[n]=(placed[n]||0);
+      const baseAngle=((n-1)/9)*TAU-Math.PI/2;
+      const spread=(TAU/9)*0.4;
+      const offset=counts[n]>1?(placed[n]/(counts[n]-1)-0.5)*spread:0;
+      result[ch]=baseAngle+offset;
+      placed[n]++;
+    }
+    Object.assign(angles,result);
+  } else if(gridType==='chaos'){
+    // Seeded random angles on the circle
+    for(const ch of alpha) angles[ch]=rand()*Math.PI*2;
+  } else if(gridType==='rosecross'||gridType==='grid5'){
+    // Map the grid position to an angle by treating (col,row) as a vector from center
+    const rows=gridType==='grid5'?5:8, cols=3;
+    for(let i=0;i<alpha.length;i++){
+      const row=Math.floor(i/cols),col=i%cols;
+      const dx=(col-(cols-1)/2), dy=(row-(rows-1)/2);
+      angles[alpha[i]]=Math.atan2(dy,dx);
+    }
+  }
+  return angles;
+}
+
+// Build path points for one arm of the sigil
+function sigilBuildPath(letters, angles, R, offsetR, cx2, cy2){
+  return letters.map(ch=>{
+    const a=angles[ch]||0;
+    const r=R*(offsetR);
+    return{x:cx2+r*Math.cos(a), y:cy2+r*Math.sin(a)};
+  }).filter(Boolean);
+}
+
+// Draw one symmetric sigil path (all rotational copies)
+function drawSymSigilPath(pathPts, symmetry, cx2, cy2, lineStyle, smooth, terminal, lw, glow, glow2, sigilCol){
+  if(pathPts.length<2)return;
+  const TAU=Math.PI*2;
+  for(let sym=0;sym<symmetry;sym++){
+    const angle=(sym/symmetry)*TAU;
+    ctx.save();
+    ctx.translate(cx2,cy2);
+    ctx.rotate(angle);
+    ctx.translate(-cx2,-cy2);
+
+    ctx.strokeStyle=sigilCol;ctx.fillStyle=sigilCol;
+    ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.shadowBlur=glow;ctx.shadowColor=glow2;
+
+    if(lineStyle==='angular'){
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++)ctx.lineTo(pathPts[i].x,pathPts[i].y);
+      ctx.stroke();
+    } else if(lineStyle==='bezier'){
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++){
+        const prev=pathPts[i-1],curr=pathPts[i];
+        const mx=(prev.x+curr.x)/2,my=(prev.y+curr.y)/2;
+        const cp1x=prev.x+(mx-prev.x)*smooth,cp1y=prev.y+(my-prev.y)*smooth;
+        const cp2x=curr.x+(mx-curr.x)*smooth,cp2y=curr.y+(my-curr.y)*smooth;
+        ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,curr.x,curr.y);
+      }
+      ctx.stroke();
+    } else { // arc
+      ctx.beginPath();ctx.moveTo(pathPts[0].x,pathPts[0].y);
+      for(let i=1;i<pathPts.length;i++){
+        const prev=pathPts[i-1],curr=pathPts[i];
+        const mx=(prev.x+curr.x)/2,my=(prev.y+curr.y)/2;
+        ctx.quadraticCurveTo(cx2+(mx-cx2)*smooth*0.4,cy2+(my-cy2)*smooth*0.4,curr.x,curr.y);
+      }
+      ctx.stroke();
+    }
+
+    // Terminals on first/last point
+    if(terminal!=='none'){
+      const tsz=lw*2.2;
+      [pathPts[0],pathPts[pathPts.length-1]].forEach(p=>{
+        if(terminal==='dot'){ctx.beginPath();ctx.arc(p.x,p.y,tsz,0,TAU);ctx.fill();}
+        else if(terminal==='circle'){const pl=ctx.lineWidth;ctx.lineWidth=lw*0.6;ctx.beginPath();ctx.arc(p.x,p.y,tsz*1.6,0,TAU);ctx.stroke();ctx.lineWidth=pl;}
+        else if(terminal==='diamond'){ctx.beginPath();ctx.moveTo(p.x,p.y-tsz*1.4);ctx.lineTo(p.x+tsz,p.y);ctx.lineTo(p.x,p.y+tsz*1.4);ctx.lineTo(p.x-tsz,p.y);ctx.closePath();ctx.fill();}
+        else if(terminal==='cross'){const pl=ctx.lineWidth;ctx.lineWidth=lw*0.7;ctx.beginPath();ctx.moveTo(p.x-tsz,p.y);ctx.lineTo(p.x+tsz,p.y);ctx.moveTo(p.x,p.y-tsz);ctx.lineTo(p.x,p.y+tsz);ctx.stroke();ctx.lineWidth=pl;}
+      });
+    }
+    ctx.restore();
+  }
+}
+
+function drawSigilOnCanvas(extraRot){
+  const sg=S.sigil;
+  if(!sg.active||!Array.isArray(sg.letters)||sg.letters.length<2)return;
+
+  const R=baseR()*sg.scale/100;
+  const baseAngleOffset=sg.rotate*Math.PI/180+(extraRot||0)*speedOf('sigil');
+  const symmetry=sg.symmetry||S.pts||6;
+  const seed=sg.seed||42;
+
+  // Get letter->angle mapping
+  const angles=sigilLetterAngles(sg.letters,symmetry,R,seed,sg.grid);
+  // Apply base rotation to all angles
+  const rotatedAngles={};
+  for(const [ch,a] of Object.entries(angles)) rotatedAngles[ch]=a+baseAngleOffset;
+
+  // Build the sigil path at the configured radial offset
+  const pathPts=sigilBuildPath(sg.letters,rotatedAngles,R,sg.offsetR||0.75,cx(),cy());
+  if(pathPts.length<2)return;
+
+  // Colour
+  const h=sg.color==='same'?S.color:sg.color;
+  const r=parseInt(h.slice(1,3),16),g2=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+  const sigilCol=`rgba(${r},${g2},${b},${sg.opacity})`;
+
+  ctx.save();
+  ctx.globalCompositeOperation=sg.blendMode||'normal';
+
+  drawSymSigilPath(
+    pathPts, symmetry, cx(), cy(),
+    sg.lineStyle, sg.smooth,
+    sg.terminal,
+    S.lw*sg.weight, S.glow*1.5, S.glow2,
+    sigilCol
+  );
+
+  ctx.restore();
+}
+
+function generateSigil(){
+  // Mobile uses mGenerateSigil(); this desktop version is safe via optional chaining
+  const intent=(document.getElementById('sigilIntention')||document.getElementById('mSigilIntent'))?.value?.trim();
+  if(!intent){S.sigil.letters=[];if(!S.anim)render();return;}
+  S.sigil.intention=intent;
+  S.sigil.reduction=(document.getElementById('sigilReduction')||document.getElementById('mSigilRed'))?.value||S.sigil.reduction;
+  S.sigil.letters=sigilProcessLetters(intent,S.sigil.reduction);
+  const dispEl=document.getElementById('sigilLetterDisplay')||document.getElementById('mSigilLetters');
+  if(dispEl)dispEl.textContent=S.sigil.letters.length?'Letters: '+S.sigil.letters.join(' · '):'(no letters remaining)';
+  const ptsEl=document.getElementById('tPts')||document.getElementById('mPts');
+  const vPtsEl=document.getElementById('vPts')||document.getElementById('mvPts');
+  if(S.sigil.syncPts&&S.sigil.letters.length>=3){
+    S.pts=Math.min(16,Math.max(3,S.sigil.letters.length));
+    if(ptsEl)ptsEl.value=S.pts;
+    if(vPtsEl)vPtsEl.textContent=S.pts;
+  }
+  if(!S.anim)render();
+}
+
+function wireSigilControls(){
+  // Wiring handled lazily in wirePanel('sigil') for mobile
+}
+wireSigilControls();
+
+
+// ── Sigil engine ──
+// ══════════════════════════════════════════════
+// ── SYMMETRIC SIGIL ENGINE ──
 
 function render(){draw(0);}
 function animate(){animId=requestAnimationFrame(animate);animT+=S.speed*0.001;t=animT;draw(animT);}
@@ -1017,7 +1251,7 @@ const GIFEncoder=(()=>{
   }
 
   // Encode frames: [{pixels:Uint8ClampedArray(w*h*4), delay:ms}]
-  function encode(frames,w,h){
+  function encode(frames,w,h,useTransparency){
     const out=[];
     const u16=v=>{out.push(v&0xff,(v>>8)&0xff);};
     const str=s=>{for(let i=0;i<s.length;i++)out.push(s.charCodeAt(i)&0xff);};
@@ -1032,6 +1266,8 @@ const GIFEncoder=(()=>{
     // GIF89a header
     str('GIF89a');u16(w);u16(h);
     out.push(0xf7,0,0); // packed: GCT present, 8bpp; bg index 0; pixel aspect 0
+    // If transparent, overwrite palette entry 0 with pure black (the transparent colour)
+    if(useTransparency){pal[0]=0;pal[1]=0;pal[2]=0;}
     for(let i=0;i<768;i++)out.push(pal[i]);
 
     // Netscape looping extension (loops forever)
@@ -1040,12 +1276,25 @@ const GIFEncoder=(()=>{
     for(const frame of frames){
       const delay=Math.max(5,Math.round(frame.delay/10)); // centiseconds, min 2
       // Graphic control extension
-      out.push(0x21,0xf9,0x04,0x00);u16(delay);out.push(0,0);
+      // Byte 4: flags — bit0=transpFlag, bits3-4=disposal(2=restore to bg)
+      const gceFlags=useTransparency?0x09:0x00; // 0x09 = disposal:2 + transparent flag
+      const transpIdx=useTransparency?0:0;
+      out.push(0x21,0xf9,0x04,gceFlags);u16(delay);out.push(transpIdx,0);
       // Image descriptor
       out.push(0x2c);u16(0);u16(0);u16(w);u16(h);out.push(0);
       // Quantise pixels to palette indices
       const px=frame.pixels,idx=new Uint8Array(w*h);
-      for(let i=0;i<w*h;i++){const j=i*4;idx[i]=nq.map(px[j],px[j+1],px[j+2]);}
+      const ALPHA_THRESHOLD=30; // pixels below this alpha become transparent
+      for(let i=0;i<w*h;i++){
+        const j=i*4;
+        if(useTransparency&&px[j+3]<ALPHA_THRESHOLD){
+          idx[i]=0; // map to transparent palette entry
+        } else {
+          // Avoid accidentally mapping to index 0 (reserved for transparency)
+          const mapped=nq.map(px[j],px[j+1],px[j+2]);
+          idx[i]=useTransparency?(mapped===0?1:mapped):mapped;
+        }
+      }
       // LZW compress and write
       out.push(8);writeSubBlocks(out,lzwEncode(idx,8));
     }
@@ -1058,43 +1307,168 @@ const GIFEncoder=(()=>{
 
 // ── GIF capture ──
 // ── MP4 export via MediaRecorder ──
+function exportMP4(){
+  const wasAnim=S.anim;
+  const statusEl=getStatusEl();
+  const FPS=30;
+  const FRAMES=Math.min(3600,getLoopFrameCount(FPS));
+  const SZ=getQualitySize();
+  const off=document.createElement('canvas');off.width=off.height=SZ;
+  const oc=off.getContext('2d');
+  const stream=off.captureStream(FPS);
+  const mime=MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')?'video/mp4;codecs=avc1':
+              MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
+  const ext=mime.startsWith('video/mp4')?'mp4':'webm';
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:6000000});
+  const chunks=[];
+  rec.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.download='magic_circle.'+ext;a.href=url;a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+    statusEl.textContent='Saved! (.'+ext+')';setTimeout(()=>statusEl.textContent='',4000);
+    if(wasAnim){S.anim=true;const _ab3=getAnimBtn();if(_ab3)_ab3.textContent='⏹';;const _ab4=getAnimBtn();if(_ab4)_ab4.classList.add('on');;animate();}
+  };
+  if(wasAnim){stopAnim();S.anim=false;}
+  rec.start();
+  let frame=0;
+  // Match live speed: live runs at ~60fps with animT+=S.speed*0.001 per tick
+  // Each export frame represents 1/FPS sec; at 60fps that's 60/FPS live ticks
+  // So angle advances S.speed*0.001*(60/FPS) per export frame — same visual rate
+  const angleStep=S.speed*0.001*(60/FPS);
+  let captureAngle=animT; // start from current live position for continuity
+  function renderFrame(){
+    if(frame>=FRAMES){rec.stop();return;}
+    draw(captureAngle);
+    oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);
+    captureAngle+=angleStep;
+    frame++;
+    statusEl.textContent='Video '+frame+'/'+FRAMES;
+    // Use requestAnimationFrame to avoid overwhelming the browser but keep pace
+    setTimeout(renderFrame,16);
+  }
+  renderFrame();
+}
 
 
-// ── Export helpers ──
-function mGetQualitySize(){return{low:240,med:360,high:480,ultra:720}[document.getElementById('meQuality').value]||360;}
-function mGetFrameCount(){return parseInt(document.getElementById('meFrames').value)||60;}
-function mRenderOffscreen(sz){const o=document.createElement('canvas');o.width=o.height=sz;o.getContext('2d').drawImage(CV,0,0,sz,sz);return o;}
-function mExportPNG(){const o=mRenderOffscreen(mGetQualitySize());const a=document.createElement('a');a.download='magic_circle.png';a.href=o.toDataURL('image/png');a.click();}
-function mExportSVG(){const sz=mGetQualitySize();const o=mRenderOffscreen(sz);const d=o.toDataURL('image/png');const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${sz}" height="${sz}"><rect width="${sz}" height="${sz}" fill="${S.bg}"/><image href="${d}" x="0" y="0" width="${sz}" height="${sz}"/></svg>`;const b=new Blob([svg],{type:'image/svg+xml'});const url=URL.createObjectURL(b);const a=document.createElement('a');a.download='magic_circle.svg';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+// ── Loop calc ──
+// ── Full loop calculation ──
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function lcmInt(a,b){return Math.round(a/gcd(Math.round(a),Math.round(b))*b);}
+function lcmFracs(fracs){
+  // fracs = [[num,den],...] representing period lengths
+  let ln=fracs[0][0],ld=fracs[0][1];
+  for(let i=1;i<fracs.length;i++){
+    const n=fracs[i][0],d=fracs[i][1];
+    // lcm(ln/ld, n/d) = lcm(ln*d, n*ld) / (ld*d)
+    const newN=lcmInt(ln*d, n*ld);
+    const newD=ld*d;
+    const g=gcd(newN,newD);
+    ln=newN/g; ld=newD/g;
+  }
+  return ln/ld;
+}
+function getFullLoopAnimT(){
+  const syncEl2=document.getElementById('mLoopSync');const sync=syncEl2?syncEl2.value:'circle';
+  // Periods as [num, den] fractions of 2π
+  // period = 1/rate, rate = how many times faster than extraRot
+  const P={
+    circle:  [1,1],    // rate 1     → period 1
+    dual:    [5,6],    // rate 6/5   → period 5/6
+    text1:   [10,3],   // rate 3/10  → period 10/3
+    text2:   [5,2],    // rate 2/5   → period 5/2
+    sigil:   [5,1],    // rate 1/5   → period 5
+  };
+  // Build periods from actual S.speeds values
+  function periodFrac(speedArr){
+    // period = 1/rate = den/num (if num=0, element is still, period=∞, ignore it)
+    if(speedArr[0]===0)return null;
+    return [speedArr[1],speedArr[0]]; // [den,num]
+  }
+  const allPeriods={
+    circle:  periodFrac(S.speeds.circle),
+    dual:    periodFrac(S.speeds.dual),
+    text1:   periodFrac(S.speeds.text1),
+    text2:   periodFrac(S.speeds.text2),
+    symbols: periodFrac(S.speeds.symbols),
+    sigil:   periodFrac(S.speeds.sigil),
+  };
+  const groups={
+    'circle':       ['circle'],
+    'circle_dual':  ['circle','dual'],
+    'circle_text':  ['circle','text1','text2'],
+    'circle_sigil': ['circle','sigil'],
+    'all':          ['circle','dual','text1','text2','sigil'],
+  };
+  const keys=groups[sync]||['circle'];
+  const fracs=keys.map(k=>allPeriods[k]).filter(Boolean);
+  if(fracs.length===0)return Math.PI*2; // fallback
+  const loopPeriod=lcmFracs(fracs); // in multiples of 2π
+  return loopPeriod*Math.PI*2; // total animT for one full loop
+}
+function getLoopFrameCount(fps){
+  const animTTotal=getFullLoopAnimT();
+  const advPerFrame=S.speed*0.001*(60/fps);
+  return Math.max(12,Math.round(animTTotal/advPerFrame));
+}
+function getFrameCount(){return 60;}
+
+// ── Export ──
+// Helper to get animation button (works on both desktop and mobile)
+function getAnimBtn(){return document.getElementById('bAnim')||document.getElementById('mAnimBtn');}
+function getStatusEl(){return getStatusEl();}
+
+function mGetQSz(){return{low:240,med:360,high:480,ultra:720}[document.getElementById('meQuality').value]||360;}
+function mRenderOff(sz){const o=document.createElement('canvas');o.width=o.height=sz;o.getContext('2d').drawImage(CV,0,0,sz,sz);return o;}
+function mExportPNG(){const o=mRenderOff(mGetQSz());const a=document.createElement('a');a.download='magic_circle.png';a.href=o.toDataURL('image/png');a.click();}
+function mExportSVG(){
+  const sz=mGetQSz();const o=mRenderOff(sz);const d=o.toDataURL('image/png');
+  const bgRect=S.transparentBg?'':`<rect width="${sz}" height="${sz}" fill="${S.bg}"/>`;
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${sz}" height="${sz}">${bgRect}<image href="${d}" x="0" y="0" width="${sz}" height="${sz}"/></svg>`;
+  const b=new Blob([svg],{type:'image/svg+xml'});const url=URL.createObjectURL(b);const a=document.createElement('a');a.download='magic_circle.svg';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
 let mGifWorking=false;
 function mExportGIF(){
   if(mGifWorking)return;mGifWorking=true;
   const st=document.getElementById('mStatus');
   const wasAnim=S.anim;
   if(wasAnim){stopAnim();S.anim=false;document.getElementById('mAnimBtn').textContent='▶';document.getElementById('mAnimBtn').classList.remove('on');}
-  const FPS=20,FRAMES=mGetFrameCount(),DELAY=Math.round(1000/FPS),SZ=mGetQualitySize();
+  const gifMode=S.gifTranspMode||'none';
+  const savedTranspBg=S.transparentBg,savedBg=S.bg;
+  if(gifMode==='matte'){S.transparentBg=false;S.bg='#080808';}
+  else if(gifMode==='threshold'){S.transparentBg=true;}
+  else{S.transparentBg=false;}
+  const useTransp=gifMode==='threshold';
+  const GIF_FPS=15;
+  const FRAMES=Math.min(500,getLoopFrameCount(GIF_FPS));
+  const FPS=GIF_FPS,DELAY=Math.round(1000/FPS),SZ=mGetQSz();
   const off=document.createElement('canvas');off.width=off.height=SZ;
   const oc=off.getContext('2d',{willReadFrequently:true});
   const frames=[];let frame=0;
   function cap(){
-    if(frame>=FRAMES){st.textContent='Encoding…';setTimeout(()=>{
-      try{const gif=GIFEncoder.encode(frames,SZ,SZ);const blob=new Blob([gif],{type:'image/gif'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download='magic_circle.gif';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);st.textContent='Saved!';setTimeout(()=>st.textContent='',3000);}
-      catch(e){st.textContent='Error: '+e.message;}
-      mGifWorking=false;
-      if(wasAnim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
-    },50);return;}
-    const angle=animT+(frame*(S.speed*0.001*(60/20)));
+    if(frame>=FRAMES){
+      S.transparentBg=savedTranspBg;S.bg=savedBg;
+      st.textContent='Encoding…';
+      setTimeout(()=>{
+        try{const gif=GIFEncoder.encode(frames,SZ,SZ,useTransp);const blob=new Blob([gif],{type:'image/gif'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download='magic_circle.gif';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);st.textContent='Saved!';setTimeout(()=>st.textContent='',3000);}
+        catch(e){st.textContent='Error: '+e.message;S.transparentBg=savedTranspBg;S.bg=savedBg;}
+        mGifWorking=false;
+        if(wasAnim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
+      },50);return;
+    }
+    const angle=animT+(frame*(S.speed*0.001*(60/FPS)));
     draw(angle);oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);
     frames.push({pixels:oc.getImageData(0,0,SZ,SZ).data,delay:DELAY});
     frame++;st.textContent='Frame '+frame+'/'+FRAMES;setTimeout(cap,0);
   }
-  st.textContent='Starting…';setTimeout(cap,10);
+  st.textContent='Loop: '+FRAMES+'f @ '+FPS+'fps…';setTimeout(cap,10);
 }
 function mExportMP4(){
   const st=document.getElementById('mStatus');
-  if(!window.MediaRecorder){st.textContent='Not supported in this browser';return;}
+  if(!window.MediaRecorder){st.textContent='Not supported';return;}
   const wasAnim=S.anim;
-  const FPS=30,FRAMES=mGetFrameCount(),SZ=mGetQualitySize();
+  const FPS=30,FRAMES=Math.min(3600,getLoopFrameCount(FPS)),SZ=mGetQSz();
   const off=document.createElement('canvas');off.width=off.height=SZ;
   const oc=off.getContext('2d');
   const stream=off.captureStream(FPS);
@@ -1106,140 +1480,86 @@ function mExportMP4(){
   rec.onstop=()=>{const blob=new Blob(chunks,{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.download='magic_circle.'+ext;a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);st.textContent='Saved (.'+ext+')';setTimeout(()=>st.textContent='',4000);if(wasAnim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}};
   if(wasAnim){stopAnim();S.anim=false;}
   rec.start();
-  const angleStep=S.speed*0.001*(60/FPS);let capAngle=animT,frame=0;
-  function rf(){if(frame>=FRAMES){rec.stop();return;}draw(capAngle);oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);capAngle+=angleStep;frame++;st.textContent='Video '+frame+'/'+FRAMES;setTimeout(rf,16);}
+  const angleStep=S.speed*0.001*(60/FPS);let capAngle=animT,frame2=0;
+  function rf(){if(frame2>=FRAMES){rec.stop();return;}draw(capAngle);oc.clearRect(0,0,SZ,SZ);oc.drawImage(CV,0,0,SZ,SZ);capAngle+=angleStep;frame2++;st.textContent='Video '+frame2+'/'+FRAMES;setTimeout(rf,16);}
   rf();
 }
 
-// ── Sheet toggle ──
-document.getElementById('sheetHandle').addEventListener('click',()=>document.getElementById('sheet').classList.toggle('open'));
+// ── Speeds ──
+// ── Speeds tab wiring ──
+const GOLDEN_PRESETS={
+  unison:  {circle:[1,1],dual:[1,1],  text1:[1,1],  text2:[1,1],  symbols:[1,1],sigil:[1,1]},
+  duplet:  {circle:[1,1],dual:[1,2],  text1:[1,2],  text2:[1,2],  symbols:[1,1],sigil:[1,2]},
+  triplet: {circle:[1,1],dual:[2,3],  text1:[1,3],  text2:[2,3],  symbols:[1,1],sigil:[1,3]},
+  quad:    {circle:[1,1],dual:[3,4],  text1:[1,2],  text2:[1,4],  symbols:[1,1],sigil:[1,4]},
+  sixth:   {circle:[1,1],dual:[2,3],  text1:[1,2],  text2:[1,3],  symbols:[1,1],sigil:[1,6]},
+  custom:  {circle:[1,1],dual:[1,1],  text1:[1,3],  text2:[1,3],  symbols:[1,1],sigil:[1,4]},
+};
 
-// ── Tabs ──
-document.querySelectorAll('.stab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
-    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('pane-'+tab.dataset.pane).classList.add('active');
-    document.getElementById('sheet').classList.add('open');
-  });
-});
-
-// ── Sliders ──
-function mSlider(id,setter,valId,fmt){
-  const el=document.getElementById(id);
-  el.addEventListener('input',()=>{const v=+el.value;setter(v);if(valId)document.getElementById(valId).textContent=fmt?fmt(v):v;if(!S.anim)render();});
+function findRatioIndex(arr){
+  // find closest match in SPEED_RATIOS
+  const dec=arr[1]===0?0:arr[0]/arr[1];
+  let best=8,bestDiff=999; // default to ×1
+  SPEED_RATIOS.forEach(([n,d,],i)=>{const v=d===0?0:n/d;const diff=Math.abs(v-dec);if(diff<bestDiff){bestDiff=diff;best=i;}});
+  return best;
 }
-mSlider('mPts',v=>S.pts=v,'mvPts');
-mSlider('mRings',v=>S.rings=v,'mvRings');
-mSlider('mDetail',v=>S.detail=v,'mvDetail');
-mSlider('mCenterPat',v=>S.detail2.centerPat=v,'mvCenterPat');
-mSlider('mScale',v=>S.scale=v,'mvScale');
-mSlider('mLW',v=>S.lw=v/10,'mvLW',v=>(v/10).toFixed(1));
-mSlider('mGlow',v=>S.glow=v,'mvGlow');
-mSlider('mOpacity',v=>S.opacity=v/100,'mvOpacity',v=>v+'%');
-mSlider('mRot',v=>S.rotate=v,'mvRot',v=>v+'°');
-mSlider('mSpeed',v=>S.speed=v,'mvSpeed');
-mSlider('mdNodeSz',v=>S.detail2.nodeSz=v,'mvNodeSz');
-mSlider('mdTickMul',v=>S.detail2.tickMul=v,'mvTickMul',v=>'x'+v);
-mSlider('mdSpokeSkip',v=>S.detail2.spokeSkip=v,'mvSpokeSkip');
-mSlider('mSymSize',v=>S.symSize=v,'mvSymSize');
-mSlider('mSymR',v=>S.symR=v,'mvSymR',v=>v+'%');
-mSlider('mtr1R',v=>S.tr[0].r=v,'mvtr1R');
-mSlider('mtr1S',v=>S.tr[0].s=v,'mvtr1S');
-mSlider('mtr1Sp',v=>S.tr[0].sp=v,'mvtr1Sp');
-mSlider('mtr2R',v=>S.tr[1].r=v,'mvtr2R');
-mSlider('mtr2S',v=>S.tr[1].s=v,'mvtr2S');
-mSlider('mtr2Sp',v=>S.tr[1].sp=v,'mvtr2Sp');
-mSlider('mtr3S',v=>S.tr[2].s=v,'mvtr3S');
 
-// ── Checkboxes ──
-[['mdCross','cross'],['mdDouble','double'],['mdDash','dash'],['mdNodeRings','nodeRings']].forEach(([id,key])=>{
-  document.getElementById(id).addEventListener('change',e=>{S.detail2[key]=e.target.checked;if(!S.anim)render();});
-});
-[['mlOuter','outer'],['mlInner','inner'],['mlGeom','geom'],['mlNodes','nodes'],['mlSpokes','spokes'],['mlTicks','ticks'],['mlCenter','center'],['mlSymbols','symbols'],['mlTextRings','textRings']].forEach(([id,key])=>{
-  document.getElementById(id).addEventListener('change',e=>{S.layers[key]=e.target.checked;if(!S.anim)render();});
-});
+function buildSpeedSelects(){
+  const keys=['circle','dual','text1','text2','symbols','sigil'];
+  const ids=['srCircle','srDual','srText1','srText2','srSymbols','srSigil'];
+  keys.forEach((key,ki)=>{
+    const sel=document.getElementById(ids[ki]);
+    if(!sel)return;
+    sel.innerHTML='';
+    SPEED_RATIOS.forEach(([n,d,label],i)=>{
+      const opt=document.createElement('option');
+      opt.value=i;opt.textContent=label;
+      sel.appendChild(opt);
+    });
+    sel.value=findRatioIndex(S.speeds[key]);
+    sel.addEventListener('change',()=>{
+      S.speeds[key]=SPEED_RATIOS[+sel.value];
+      updateLoopInfo();
+      if(!S.anim)render();
+    });
+  });
+  updateLoopInfo();
+}
 
-// ── Text inputs ──
-[['mtr1',0],['mtr2',1],['mtr3',2]].forEach(([id,idx])=>{
-  document.getElementById(id).addEventListener('input',e=>{S.tr[idx].text=e.target.value;if(!S.anim)render();});
-});
-[['mtr1Flip',0],['mtr2Flip',1]].forEach(([id,idx])=>{
-  document.getElementById(id).addEventListener('change',e=>{S.tr[idx].flip=e.target.checked;if(!S.anim)render();});
-});
+function updateLoopInfo(){
+  const syncEl=document.getElementById('mLoopSync');
+  const infoEl=document.getElementById('mLoopInfoBox');
+  if(!syncEl||!infoEl)return;
+  try{
+    const animT=getFullLoopAnimT();
+    const f15=Math.min(9999,Math.round(animT/(S.speed*0.001*(60/15))));
+    const s15=Math.round(f15/15*10)/10;
+    const f30=Math.min(9999,Math.round(animT/(S.speed*0.001*(60/30))));
+    const s30=Math.round(f30/30*10)/10;
+    infoEl.innerHTML=
+      '<b style="color:#aaa">GIF:</b> '+f15+'f @ 15fps = '+s15+'s<br>'+
+      '<b style="color:#aaa">MP4:</b> '+f30+'f @ 30fps = '+s30+'s';
+  }catch(e){
+    if(infoEl)infoEl.textContent='Loop: error';
+  }
+}
 
-// ── Style select ──
-document.getElementById('styleSelect').addEventListener('change',e=>{S.style=e.target.value;if(!S.anim)render();});
-
-// ── Anim & Random ──
-document.getElementById('mAnimBtn').addEventListener('click',()=>{
-  S.anim=!S.anim;const btn=document.getElementById('mAnimBtn');
-  btn.textContent=S.anim?'⏹':'▶';btn.classList.toggle('on',S.anim);
-  if(S.anim)animate();else{stopAnim();render();}
-});
-document.getElementById('mRandBtn').addEventListener('click',()=>{
-  const styles=['star','orbital','alchemic','pentagram','mandala','celtic','sigil','rose','enochian','sacred','compass','labyrinth','zodiac','fractal','gothic','norse','chaos'];
-  const colKeys=Object.keys(COLS);
-  S.style=styles[Math.floor(Math.random()*styles.length)];
-  S.pts=3+Math.floor(Math.random()*14);S.rings=1+Math.floor(Math.random()*7);S.detail=1+Math.floor(Math.random()*5);
-  const ck=colKeys[Math.floor(Math.random()*colKeys.length)];S.color=COLS[ck];S.glow2=GLOWS[ck];S.rotate=Math.floor(Math.random()*360);
-  document.getElementById('styleSelect').value=S.style;
-  document.getElementById('mPts').value=S.pts;document.getElementById('mvPts').textContent=S.pts;
-  document.getElementById('mRings').value=S.rings;document.getElementById('mvRings').textContent=S.rings;
-  document.getElementById('mDetail').value=S.detail;document.getElementById('mvDetail').textContent=S.detail;
-  document.getElementById('mRot').value=S.rotate;document.getElementById('mvRot').textContent=S.rotate+'°';
-  document.querySelectorAll('#mSwColor .csw').forEach(x=>x.classList.remove('sel'));
-  document.querySelector('#mSwColor .csw[data-ck="'+ck+'"]')?.classList.add('sel');
+function applyGolden(name){
+  const preset=GOLDEN_PRESETS[name];
+  if(!preset)return;
+  Object.assign(S.speeds,preset);
+  // Update all selects
+  const keys=['circle','dual','text1','text2','symbols','sigil'];
+  const ids=['srCircle','srDual','srText1','srText2','srSymbols','srSigil'];
+  keys.forEach((key,ki)=>{
+    const sel=document.getElementById(ids[ki]);
+    if(sel)sel.value=findRatioIndex(S.speeds[key]);
+  });
+  updateLoopInfo();
   if(!S.anim)render();
-});
-
-// ── FABs ──
-document.getElementById('fabPulse').addEventListener('click',()=>{
-  S.pulse=!S.pulse;document.getElementById('fabPulse').classList.toggle('on',S.pulse);
-  if(S.pulse&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
-  else if(!S.anim)render();
-});
-document.getElementById('fabDual').addEventListener('click',()=>{S.dual=!S.dual;document.getElementById('fabDual').classList.toggle('on',S.dual);if(!S.anim)render();});
-document.getElementById('fabSparks').addEventListener('click',()=>{
-  S.sparks=!S.sparks;document.getElementById('fabSparks').classList.toggle('on',S.sparks);
-  if(S.sparks&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}
-  if(!S.sparks)sparks=[];
-});
-
-// ── Color swatches ──
-function buildCSwatch(containerId,colMap,onClick){
-  const c=document.getElementById(containerId);
-  Object.entries(colMap).forEach(([k,hex])=>{
-    const s=document.createElement('div');s.className='csw';s.style.background=hex;s.dataset.ck=k;s.title=k;
-    s.addEventListener('click',()=>{c.querySelectorAll('.csw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');onClick(k,hex);});
-    c.appendChild(s);
-  });
 }
-buildCSwatch('mSwColor',COLS,(k,hex)=>{S.color=hex;S.glow2=GLOWS[k];if(!S.anim)render();});
-document.querySelector('#mSwColor .csw').classList.add('sel');
-buildCSwatch('mSwBg',BGS,(k,hex)=>{S.bg=hex;document.getElementById('mCustomBg').value=hex;if(!S.anim)render();});
-document.querySelector('#mSwBg .csw').classList.add('sel');
-buildCSwatch('mSwColor2',COLS,(k,hex)=>{S.color2=hex;if(!S.anim)render();});
-document.getElementById('mCustomColor').addEventListener('input',e=>{S.color=e.target.value;S.glow2=e.target.value+'88';document.querySelectorAll('#mSwColor .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
-document.getElementById('mCustomBg').addEventListener('input',e=>{S.bg=e.target.value;document.querySelectorAll('#mSwBg .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
 
-// ── Symbol picker ──
-let mSelSyms=[];
-function mBuildSymGrid(setKey){
-  const g=document.getElementById('mSymGrid');g.innerHTML='';
-  (SYM_SETS[setKey]||[]).forEach(s=>{
-    const d=document.createElement('div');d.className='msym';d.textContent=s;
-    d.addEventListener('click',()=>{if(mSelSyms.includes(s)){mSelSyms=mSelSyms.filter(x=>x!==s);d.classList.remove('sel');}else{mSelSyms.push(s);d.classList.add('sel');}document.getElementById('mSelSyms').textContent=mSelSyms.join('');});
-    g.appendChild(d);
-  });
-}
-document.getElementById('mSymSet').addEventListener('change',e=>mBuildSymGrid(e.target.value));
-mBuildSymGrid('alchemic');
-function mClearSyms(){mSelSyms=[];document.getElementById('mSelSyms').textContent='';document.querySelectorAll('.msym').forEach(x=>x.classList.remove('sel'));}
-function mApplySyms(){S.symbols=[...mSelSyms];if(!S.anim)render();}
 
-// ── Presets ──
 const PRESETS=[
   {name:'Summoning seal',style:'alchemic',pts:6,rings:3,detail:4,color:'crimson',bg:'#000000',dual:true,tr0:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',tr1:'ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ',tr2:''},
   {name:'Celestial orbit',style:'orbital',pts:8,rings:4,detail:4,color:'cyan',bg:'#000820',tr0:'☉ ☽ ☿ ♀ ♁ ♂ ♃ ♄ ♅ ♆',tr1:'♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓',tr2:''},
@@ -1250,37 +1570,508 @@ const PRESETS=[
   {name:'Enochian gate',style:'enochian',pts:8,rings:4,detail:5,color:'amber',bg:'#100008',dual:true,tr0:'Α Β Γ Δ Ε Ζ Η Θ',tr1:'🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇',tr2:'VERITAS'},
   {name:'Star of chaos',style:'star',pts:8,rings:4,detail:5,color:'amber',bg:'#100008',dual:true,tr0:'',tr1:'',tr2:''},
 ];
-function mApplyPreset(p){
-  const ck=p.color;
-  Object.assign(S,{style:p.style,pts:p.pts,rings:p.rings,detail:p.detail,
-    color:COLS[ck]||COLS.gold,glow2:GLOWS[ck]||GLOWS.gold,bg:p.bg,dual:!!p.dual});
-  if(p.tr0!==undefined)S.tr[0].text=p.tr0;
-  if(p.tr1!==undefined)S.tr[1].text=p.tr1;
-  if(p.tr2!==undefined)S.tr[2].text=p.tr2;
-  document.getElementById('styleSelect').value=S.style;
-  document.getElementById('mPts').value=S.pts;document.getElementById('mvPts').textContent=S.pts;
-  document.getElementById('mRings').value=S.rings;document.getElementById('mvRings').textContent=S.rings;
-  document.getElementById('mDetail').value=S.detail;document.getElementById('mvDetail').textContent=S.detail;
-  document.getElementById('fabDual').classList.toggle('on',S.dual);
-  document.getElementById('mtr1').value=S.tr[0].text;
-  document.getElementById('mtr2').value=S.tr[1].text;
-  document.getElementById('mtr3').value=S.tr[2].text;
+
+// ── Panels ──
+const PANELS = {};
+
+function buildPanel(name) {
+  if (PANELS[name]) return PANELS[name];
+  const div = document.createElement('div');
+
+  if (name === 'adjust') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Geometry</div>
+      <div class="srow"><label>Points</label><input type="range" id="mPts" min="3" max="16" value="6"><span class="sv" id="mvPts">6</span></div>
+      <div class="srow"><label>Rings</label><input type="range" id="mRings" min="1" max="8" value="3"><span class="sv" id="mvRings">3</span></div>
+      <div class="srow"><label>Detail</label><input type="range" id="mDetail" min="1" max="5" value="3"><span class="sv" id="mvDetail">3</span></div>
+      <div class="srow"><label>Center pat.</label><input type="range" id="mCenterPat" min="0" max="4" value="0"><span class="sv" id="mvCenterPat">0</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Appearance</div>
+      <div class="srow"><label>Scale</label><input type="range" id="mScale" min="40" max="130" value="100"><span class="sv" id="mvScale">100</span></div>
+      <div class="srow"><label>Line</label><input type="range" id="mLW" min="2" max="40" value="12"><span class="sv" id="mvLW">1.2</span></div>
+      <div class="srow"><label>Glow</label><input type="range" id="mGlow" min="0" max="50" value="16"><span class="sv" id="mvGlow">16</span></div>
+      <div class="srow"><label>Opacity</label><input type="range" id="mOpacity" min="10" max="100" value="100"><span class="sv" id="mvOpacity">100%</span></div>
+      <div class="srow"><label>Rotate</label><input type="range" id="mRot" min="0" max="360" value="0"><span class="sv" id="mvRot">0°</span></div>
+      <div class="srow"><label>Master speed</label><input type="range" id="mSpeed" min="1" max="30" value="5"><span class="sv" id="mvSpeed">5</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Layers</div>
+      <div class="crow"><label>Outer rings</label><label class="tog"><input type="checkbox" id="mlOuter" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Inner rings</label><label class="tog"><input type="checkbox" id="mlInner" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Geometry</label><label class="tog"><input type="checkbox" id="mlGeom" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Nodes</label><label class="tog"><input type="checkbox" id="mlNodes" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Spokes</label><label class="tog"><input type="checkbox" id="mlSpokes" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Tick marks</label><label class="tog"><input type="checkbox" id="mlTicks" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Center core</label><label class="tog"><input type="checkbox" id="mlCenter" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Text rings</label><label class="tog"><input type="checkbox" id="mlTextRings" checked><span class="knob"></span></label></div>
+    </div>`;
+  }
+
+  else if (name === 'color') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Stroke colour</div>
+      <div class="cgrid" id="mSwColor"></div>
+      <input type="color" id="mCustomColor" value="#FFD700">
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Background</div>
+      <div class="cgrid" id="mSwBg"></div>
+      <input type="color" id="mCustomBg" value="#000000">
+      <div class="crow" style="margin-top:4px"><label>Transparent BG</label><label class="tog"><input type="checkbox" id="mTranspBg"><span class="knob"></span></label></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Second colour (dual)</div>
+      <div class="cgrid" id="mSwColor2"></div>
+    </div>`;
+  }
+
+  else if (name === 'detail') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Nodes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label style="font-size:11px;color:#666">Shape</label>
+        <select id="mdNodeStyle" style="font-size:11px;padding:3px 5px;border-radius:4px">
+          <option value="circle">Circle</option><option value="square">Square</option>
+          <option value="diamond">Diamond</option><option value="triangle">Triangle</option><option value="cross">Cross</option>
+        </select>
+      </div>
+      <div class="crow"><label>Fill nodes</label><label class="tog"><input type="checkbox" id="mdNodeFill"><span class="knob"></span></label></div>
+      <div class="crow"><label>Node rings</label><label class="tog"><input type="checkbox" id="mdNodeRings" checked><span class="knob"></span></label></div>
+      <div class="srow"><label>Size</label><input type="range" id="mdNodeSz" min="2" max="28" value="6"><span class="sv" id="mvNodeSz">6</span></div>
+      <div class="srow"><label>Multiplier</label><input type="range" id="mdNodeMul" min="1" max="6" value="1"><span class="sv" id="mvNodeMul">×1</span></div>
+      <div class="srow"><label>Offset</label><input type="range" id="mdNodeOffset" min="0" max="180" value="0"><span class="sv" id="mvNodeOffset">0°</span></div>
+      <div class="srow"><label>Opacity</label><input type="range" id="mdNodeOpacity" min="10" max="100" value="100"><span class="sv" id="mvNodeOpacity">100%</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Spokes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label style="font-size:11px;color:#666">Style</label>
+        <select id="mdSpokeStyle" style="font-size:11px;padding:3px 5px;border-radius:4px">
+          <option value="solid">Solid</option><option value="dashed">Dashed</option>
+          <option value="dotted">Dotted</option><option value="tapered">Tapered</option>
+        </select>
+      </div>
+      <div class="srow"><label>Skip</label><input type="range" id="mdSpokeSkip" min="1" max="8" value="1"><span class="sv" id="mvSpokeSkip">1</span></div>
+      <div class="srow"><label>Multiplier</label><input type="range" id="mdSpokeMul" min="1" max="6" value="1"><span class="sv" id="mvSpokeMul">×1</span></div>
+      <div class="srow"><label>Inner</label><input type="range" id="mdSpokeInner" min="0" max="90" value="5"><span class="sv" id="mvSpokeInner">5%</span></div>
+      <div class="srow"><label>Outer</label><input type="range" id="mdSpokeOuter" min="10" max="100" value="95"><span class="sv" id="mvSpokeOuter">95%</span></div>
+      <div class="srow"><label>Offset</label><input type="range" id="mdSpokeOffset" min="0" max="180" value="0"><span class="sv" id="mvSpokeOffset">0°</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Inner geometry</div>
+      <div class="crow"><label>Cross lines</label><label class="tog"><input type="checkbox" id="mdCross" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Double ring</label><label class="tog"><input type="checkbox" id="mdDouble" checked><span class="knob"></span></label></div>
+      <div class="crow"><label>Dashed ring</label><label class="tog"><input type="checkbox" id="mdDash"><span class="knob"></span></label></div>
+      <div class="srow" style="margin-top:6px"><label>Tick mult.</label><input type="range" id="mdTickMul" min="1" max="6" value="2"><span class="sv" id="mvTickMul">×2</span></div>
+    </div>`;
+  }
+
+  else if (name === 'sigil') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Sigil layer</div>
+      <div class="crow"><label>Enable sigil</label><label class="tog"><input type="checkbox" id="mSigilActive"><span class="knob"></span></label></div>
+      <div class="crow"><label>Sync → circle pts</label><label class="tog"><input type="checkbox" id="mSigilSync"><span class="knob"></span></label></div>
+      <input type="text" id="mSigilIntent" placeholder="Intention e.g. PROTECTION" style="margin-top:8px">
+      <button onclick="mGenerateSigil()" style="width:100%;padding:7px;font-size:12px;background:#111;color:#aaa;border:1px solid #2a2a2a;border-radius:5px;cursor:pointer;margin-bottom:6px">Generate ✦</button>
+      <div style="font-size:10px;color:#555;min-height:14px;margin-bottom:6px" id="mSigilLetters"></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Options</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:11px;color:#666">Reduction</label>
+          <select id="mSigilRed" style="font-size:11px;padding:3px 5px;border-radius:4px">
+            <option value="dupes">Remove dupes</option><option value="dupvow">Dupes+vowels</option><option value="none">Keep all</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:11px;color:#666">Grid</label>
+          <select id="mSigilGrid" style="font-size:11px;padding:3px 5px;border-radius:4px">
+            <option value="circle">Letter circle</option><option value="wheel">Number wheel</option>
+            <option value="rosecross">Rose Cross</option><option value="grid5">5×5</option><option value="chaos">Chaos</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:11px;color:#666">Line</label>
+          <select id="mSigilLine" style="font-size:11px;padding:3px 5px;border-radius:4px">
+            <option value="bezier">Bezier</option><option value="angular">Angular</option><option value="arc">Arc</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:11px;color:#666">Terminals</label>
+          <select id="mSigilTerm" style="font-size:11px;padding:3px 5px;border-radius:4px">
+            <option value="dot">Dot</option><option value="circle">Circle</option>
+            <option value="diamond">Diamond</option><option value="cross">Cross</option><option value="none">None</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <label style="font-size:11px;color:#666">Blend</label>
+          <select id="mSigilBlend" style="font-size:11px;padding:3px 5px;border-radius:4px">
+            <option value="normal">Normal</option><option value="screen">Screen</option>
+            <option value="overlay">Overlay</option><option value="soft-light">Soft light</option>
+          </select>
+        </div>
+      </div>
+      <div class="srow" style="margin-top:8px"><label>Symmetry</label><input type="range" id="mSigilSym" min="1" max="16" value="6"><span class="sv" id="mvSigilSym">6</span></div>
+      <div class="srow"><label>Ring offset</label><input type="range" id="mSigilOffR" min="20" max="100" value="75"><span class="sv" id="mvSigilOffR">0.75</span></div>
+      <div class="srow"><label>Scale</label><input type="range" id="mSigilScale" min="20" max="130" value="70"><span class="sv" id="mvSigilScale">70%</span></div>
+      <div class="srow"><label>Rotate</label><input type="range" id="mSigilRot" min="0" max="360" value="0"><span class="sv" id="mvSigilRot">0°</span></div>
+      <div class="srow"><label>Opacity</label><input type="range" id="mSigilOp" min="5" max="100" value="70"><span class="sv" id="mvSigilOp">70%</span></div>
+      <div class="srow"><label>Weight</label><input type="range" id="mSigilWt" min="20" max="300" value="100"><span class="sv" id="mvSigilWt">1.0×</span></div>
+      <div class="srow"><label>Smooth</label><input type="range" id="mSigilSm" min="0" max="100" value="40"><span class="sv" id="mvSigilSm">40%</span></div>
+      <div class="srow"><label>Chaos seed</label><input type="range" id="mSigilSeed" min="1" max="999" value="42"><span class="sv" id="mvSigilSeed">42</span></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Symbols on ring</div>
+      <select id="mSymSet" style="width:100%;padding:5px;font-size:12px;margin-bottom:8px;border-radius:5px">
+        <option value="alchemic">Alchemical</option><option value="astro">Astrological</option>
+        <option value="futhark">Elder Futhark</option><option value="greek">Greek</option>
+        <option value="geo">Geometric</option><option value="occult">Occult</option>
+        <option value="latin">Latin</option><option value="arabic">Arabic</option>
+      </select>
+      <div id="mSymGrid"></div>
+      <div style="font-size:18px;min-height:28px;background:#111;border:1px solid #1e1e1e;border-radius:5px;padding:5px;letter-spacing:3px;margin:6px 0" id="mSelSyms"></div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="ebtn" style="flex:1" onclick="mClearSyms()">Clear</button>
+        <button class="ebtn" style="flex:1" onclick="mApplySyms()">Apply ↗</button>
+      </div>
+      <div class="srow"><label>Size</label><input type="range" id="mSymSize" min="8" max="40" value="16"><span class="sv" id="mvSymSize">16</span></div>
+      <div class="srow"><label>Radius</label><input type="range" id="mSymR" min="60" max="130" value="100"><span class="sv" id="mvSymR">100%</span></div>
+    </div>`;
+  }
+
+  else if (name === 'text') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Ring 1</div>
+      <input type="text" id="mtr1" value="🜀 🜁 🜂 🜃 🜄 🜅 🜆 🜇">
+      <div class="srow"><label>Radius</label><input type="range" id="mtr1R" min="50" max="140" value="108"><span class="sv" id="mvtr1R">108</span></div>
+      <div class="srow"><label>Size</label><input type="range" id="mtr1S" min="8" max="32" value="13"><span class="sv" id="mvtr1S">13</span></div>
+      <div class="srow"><label>Spacing</label><input type="range" id="mtr1Sp" min="1" max="40" value="14"><span class="sv" id="mvtr1Sp">14</span></div>
+      <div class="crow"><label>Flip</label><label class="tog"><input type="checkbox" id="mtr1Flip"><span class="knob"></span></label></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Ring 2</div>
+      <input type="text" id="mtr2" value="ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚾ ᛁ ᛃ">
+      <div class="srow"><label>Radius</label><input type="range" id="mtr2R" min="50" max="140" value="92"><span class="sv" id="mvtr2R">92</span></div>
+      <div class="srow"><label>Size</label><input type="range" id="mtr2S" min="8" max="32" value="11"><span class="sv" id="mvtr2S">11</span></div>
+      <div class="srow"><label>Spacing</label><input type="range" id="mtr2Sp" min="1" max="40" value="12"><span class="sv" id="mvtr2Sp">12</span></div>
+      <div class="crow"><label>Flip</label><label class="tog"><input type="checkbox" id="mtr2Flip" checked><span class="knob"></span></label></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Center inscription</div>
+      <input type="text" id="mtr3" placeholder="Center text…">
+      <div class="srow"><label>Size</label><input type="range" id="mtr3S" min="8" max="48" value="20"><span class="sv" id="mvtr3S">20</span></div>
+    </div>`;
+  }
+
+  else if (name === 'speeds') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Golden presets</div>
+      <div class="pgrid">
+        <button class="gbtn" onclick="applyGolden('unison')">Unison<br><span style="font-size:9px;color:#555">all ×1 — 1 loop</span></button>
+        <button class="gbtn" onclick="applyGolden('duplet')">Duplet<br><span style="font-size:9px;color:#555">×1 + ×½ — 2 loops</span></button>
+        <button class="gbtn" onclick="applyGolden('triplet')">Triplet<br><span style="font-size:9px;color:#555">×1 + ⅔ + ⅓ — 3 loops</span></button>
+        <button class="gbtn" onclick="applyGolden('quad')">Quad<br><span style="font-size:9px;color:#555">×1 ¾ ½ ¼ — 4 loops</span></button>
+        <button class="gbtn" onclick="applyGolden('sixth')">Sixth<br><span style="font-size:9px;color:#555">×1 ⅔ ½ ⅓ ⅙ — 6 loops</span></button>
+        <button class="gbtn" onclick="applyGolden('custom')">Reset<br><span style="font-size:9px;color:#555">defaults</span></button>
+      </div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Per-element ratio</div>
+      <div class="speed-row"><label>Circle</label><select id="srCircle" class="speed-sel"></select></div>
+      <div class="speed-row"><label>Dual layer</label><select id="srDual" class="speed-sel"></select></div>
+      <div class="speed-row"><label>Text ring 1</label><select id="srText1" class="speed-sel"></select></div>
+      <div class="speed-row"><label>Text ring 2</label><select id="srText2" class="speed-sel"></select></div>
+      <div class="speed-row"><label>Symbols</label><select id="srSymbols" class="speed-sel"></select></div>
+      <div class="speed-row"><label>Sigil</label><select id="srSigil" class="speed-sel"></select></div>
+      <div style="margin-top:10px;font-size:11px;color:#555;line-height:1.8;background:#0d0d0d;border-radius:5px;padding:8px" id="mLoopInfoBox">Loop: —</div>
+    </div>`;
+  }
+
+  else if (name === 'export') {
+    div.innerHTML = `
+    <div class="dsec">
+      <div class="dsec-h">Quality</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <label style="font-size:11px;color:#666;width:60px;flex-shrink:0">Resolution</label>
+        <select id="meQuality" style="flex:1;padding:5px;font-size:12px;border-radius:5px">
+          <option value="low">Low 240px</option><option value="med" selected>Med 360px</option>
+          <option value="high">High 480px</option><option value="ultra">Ultra 720px</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+        <label style="font-size:11px;color:#666;width:60px;flex-shrink:0">Loop sync</label>
+        <select id="mLoopSync" style="flex:1;padding:5px;font-size:12px;border-radius:5px">
+          <option value="circle">Main circle</option>
+          <option value="circle_dual">+ Dual layer</option>
+          <option value="circle_text">+ Text rings</option>
+          <option value="circle_sigil">+ Sigil</option>
+          <option value="all">All elements</option>
+        </select>
+      </div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">GIF transparency</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <select id="mGifTransp" style="flex:1;padding:5px;font-size:12px;border-radius:5px">
+          <option value="none">Solid BG</option>
+          <option value="matte">Dark matte</option>
+          <option value="threshold">Transparent</option>
+        </select>
+      </div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Save</div>
+      <div class="egrid">
+        <button class="ebtn" onclick="mExportPNG()">📷 PNG</button>
+        <button class="ebtn" onclick="mExportSVG()">⬡ SVG</button>
+        <button class="ebtn" onclick="mExportGIF()">🎞 GIF</button>
+        <button class="ebtn" onclick="mExportMP4()">🎬 MP4</button>
+      </div>
+      <div id="mStatus" style="font-size:11px;color:#777;text-align:center;padding:6px 0;min-height:22px"></div>
+    </div>
+    <div class="dsec">
+      <div class="dsec-h">Presets</div>
+      <div class="pgrid" id="mPresetList"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <input type="text" id="mPresetName" placeholder="Save name…" style="flex:1;margin-bottom:0">
+        <button class="ebtn" style="flex-shrink:0;padding:6px 12px" onclick="mSavePreset()">Save</button>
+      </div>
+      <div class="pgrid" id="mUserPresets" style="margin-top:6px"></div>
+    </div>`;
+  }
+
+  PANELS[name] = div;
+  return div;
+}
+
+// ── Navigation ──
+let currentPanel = 'adjust';
+const drawer = document.getElementById('drawer');
+const drawerContent = document.getElementById('drawerContent');
+
+function openPanel(name) {
+  const wasOpen = drawer.classList.contains('open') && currentPanel === name;
+  if (wasOpen) {
+    drawer.classList.remove('open');
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+    return;
+  }
+  currentPanel = name;
+  drawerContent.innerHTML = '';
+  drawerContent.appendChild(buildPanel(name));
+  drawer.classList.add('open');
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
+  wirePanel(name);
+}
+
+document.getElementById('drawerHandle').addEventListener('click', () => {
+  drawer.classList.toggle('open');
+});
+
+document.querySelectorAll('.navbtn').forEach(btn => {
+  btn.addEventListener('click', () => openPanel(btn.dataset.panel));
+});
+
+// ── Wire panel controls ──
+function wirePanel(name) {
+  function sl(id, setter, valId, fmt) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => { const v = +el.value; setter(v); if (valId) document.getElementById(valId).textContent = fmt ? fmt(v) : v; if (!S.anim) render(); });
+  }
+  function ck(id, setter) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', e => { setter(e.target.checked); if (!S.anim) render(); });
+  }
+  function sel(id, setter) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', e => { setter(e.target.value); if (!S.anim) render(); });
+  }
+
+  if (name === 'adjust') {
+    sl('mPts', v=>S.pts=v, 'mvPts');
+    sl('mRings', v=>S.rings=v, 'mvRings');
+    sl('mDetail', v=>S.detail=v, 'mvDetail');
+    sl('mCenterPat', v=>S.detail2.centerPat=v, 'mvCenterPat');
+    sl('mScale', v=>S.scale=v, 'mvScale');
+    sl('mLW', v=>S.lw=v/10, 'mvLW', v=>(v/10).toFixed(1));
+    sl('mGlow', v=>S.glow=v, 'mvGlow');
+    sl('mOpacity', v=>S.opacity=v/100, 'mvOpacity', v=>v+'%');
+    sl('mRot', v=>S.rotate=v, 'mvRot', v=>v+'°');
+    sl('mSpeed', v=>S.speed=v, 'mvSpeed');
+    [['mlOuter','outer'],['mlInner','inner'],['mlGeom','geom'],['mlNodes','nodes'],
+     ['mlSpokes','spokes'],['mlTicks','ticks'],['mlCenter','center'],['mlTextRings','textRings']
+    ].forEach(([id,key]) => ck(id, v=>S.layers[key]=v));
+  }
+
+  else if (name === 'color') {
+    buildCSwatch('mSwColor', COLS, (k,hex)=>{S.color=hex;S.glow2=GLOWS[k];if(!S.anim)render();});
+    buildCSwatch('mSwBg', BGS, (k,hex)=>{S.bg=hex;document.getElementById('mCustomBg').value=hex;if(!S.anim)render();});
+    buildCSwatch('mSwColor2', COLS, (k,hex)=>{S.color2=hex;if(!S.anim)render();});
+    document.getElementById('mSwColor').querySelector('.csw')?.classList.add('sel');
+    document.getElementById('mSwBg').querySelector('.csw')?.classList.add('sel');
+    document.getElementById('mCustomColor').addEventListener('input',e=>{S.color=e.target.value;S.glow2=e.target.value+'88';document.querySelectorAll('#mSwColor .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
+    document.getElementById('mCustomBg').addEventListener('input',e=>{S.bg=e.target.value;document.querySelectorAll('#mSwBg .csw').forEach(x=>x.classList.remove('sel'));if(!S.anim)render();});
+    ck('mTranspBg', v=>{S.transparentBg=v;if(!S.anim)render();});
+  }
+
+  else if (name === 'detail') {
+    sel('mdNodeStyle', v=>{S.detail2.nodeStyle=v;});
+    ck('mdNodeFill', v=>S.detail2.nodeFill=v);
+    ck('mdNodeRings', v=>S.detail2.nodeRings=v);
+    sl('mdNodeSz', v=>S.detail2.nodeSz=v, 'mvNodeSz');
+    sl('mdNodeMul', v=>S.detail2.nodeMul=v, 'mvNodeMul', v=>'×'+v);
+    sl('mdNodeOffset', v=>S.detail2.nodeOffset=v, 'mvNodeOffset', v=>v+'°');
+    sl('mdNodeOpacity', v=>S.detail2.nodeOpacity=v/100, 'mvNodeOpacity', v=>v+'%');
+    sel('mdSpokeStyle', v=>S.detail2.spokeStyle=v);
+    sl('mdSpokeSkip', v=>S.detail2.spokeSkip=v, 'mvSpokeSkip');
+    sl('mdSpokeMul', v=>S.detail2.spokeMul=v, 'mvSpokeMul', v=>'×'+v);
+    sl('mdSpokeInner', v=>S.detail2.spokeInner=v, 'mvSpokeInner', v=>v+'%');
+    sl('mdSpokeOuter', v=>S.detail2.spokeOuter=v, 'mvSpokeOuter', v=>v+'%');
+    sl('mdSpokeOffset', v=>S.detail2.spokeOffset=v, 'mvSpokeOffset', v=>v+'°');
+    ck('mdCross', v=>S.detail2.cross=v);
+    ck('mdDouble', v=>S.detail2.double=v);
+    ck('mdDash', v=>S.detail2.dash=v);
+    sl('mdTickMul', v=>S.detail2.tickMul=v, 'mvTickMul', v=>'×'+v);
+  }
+
+  else if (name === 'sigil') {
+    ck('mSigilActive', v=>{S.sigil.active=v;});
+    ck('mSigilSync', v=>{S.sigil.syncPts=v;if(v&&S.sigil.letters.length>=3)mGenerateSigil();});
+    sel('mSigilRed', v=>{S.sigil.reduction=v;mGenerateSigil();});
+    sel('mSigilGrid', v=>S.sigil.grid=v);
+    sel('mSigilLine', v=>S.sigil.lineStyle=v);
+    sel('mSigilTerm', v=>S.sigil.terminal=v);
+    sel('mSigilBlend', v=>S.sigil.blendMode=v);
+    sl('mSigilSym', v=>S.sigil.symmetry=v, 'mvSigilSym');
+    sl('mSigilOffR', v=>S.sigil.offsetR=v/100, 'mvSigilOffR', v=>(v/100).toFixed(2));
+    sl('mSigilScale', v=>S.sigil.scale=v, 'mvSigilScale', v=>v+'%');
+    sl('mSigilRot', v=>S.sigil.rotate=v, 'mvSigilRot', v=>v+'°');
+    sl('mSigilOp', v=>S.sigil.opacity=v/100, 'mvSigilOp', v=>v+'%');
+    sl('mSigilWt', v=>S.sigil.weight=v/100, 'mvSigilWt', v=>(v/100).toFixed(1)+'×');
+    sl('mSigilSm', v=>S.sigil.smooth=v/100, 'mvSigilSm', v=>v+'%');
+    sl('mSigilSeed', v=>S.sigil.seed=v, 'mvSigilSeed');
+    document.getElementById('mSigilIntent').addEventListener('keydown',e=>{if(e.key==='Enter')mGenerateSigil();});
+    // Symbol picker
+    mBuildSymGrid('alchemic');
+    document.getElementById('mSymSet').addEventListener('change',e=>mBuildSymGrid(e.target.value));
+    sl('mSymSize', v=>S.symSize=v, 'mvSymSize');
+    sl('mSymR', v=>S.symR=v, 'mvSymR', v=>v+'%');
+  }
+
+  else if (name === 'text') {
+    document.getElementById('mtr1').addEventListener('input',e=>{S.tr[0].text=e.target.value;if(!S.anim)render();});
+    document.getElementById('mtr2').addEventListener('input',e=>{S.tr[1].text=e.target.value;if(!S.anim)render();});
+    document.getElementById('mtr3').addEventListener('input',e=>{S.tr[2].text=e.target.value;if(!S.anim)render();});
+    sl('mtr1R',v=>S.tr[0].r=v,'mvtr1R'); sl('mtr1S',v=>S.tr[0].s=v,'mvtr1S'); sl('mtr1Sp',v=>S.tr[0].sp=v,'mvtr1Sp');
+    sl('mtr2R',v=>S.tr[1].r=v,'mvtr2R'); sl('mtr2S',v=>S.tr[1].s=v,'mvtr2S'); sl('mtr2Sp',v=>S.tr[1].sp=v,'mvtr2Sp');
+    sl('mtr3S',v=>S.tr[2].s=v,'mvtr3S');
+    ck('mtr1Flip',v=>S.tr[0].flip=v); ck('mtr2Flip',v=>S.tr[1].flip=v);
+  }
+
+  else if (name === 'speeds') {
+    buildSpeedSelects();
+    // mLoopSync lives in the export panel — update loop info when it changes if open
+    const ls=document.getElementById('mLoopSync');
+    if(ls)ls.addEventListener('change',()=>updateLoopInfo());
+  }
+
+  else if (name === 'export') {
+    document.getElementById('mGifTransp').addEventListener('change',e=>S.gifTranspMode=e.target.value);
+    const ls2=document.getElementById('mLoopSync');
+    if(ls2)ls2.addEventListener('change',()=>updateLoopInfo());
+    // Presets (using global PRESETS)
+    const mpl=document.getElementById('mPresetList');
+    PRESETS.forEach(p=>{const b=document.createElement('button');b.className='pbtn';b.textContent=p.name;b.addEventListener('click',()=>mApplyPreset(p));mpl.appendChild(b);});
+    renderUserPresets();
+  }
+}
+
+// ── Helpers ──
+function buildCSwatch(containerId,colMap,onClick){
+  const c=document.getElementById(containerId);
+  if(!c||c.children.length)return;
+  Object.entries(colMap).forEach(([k,hex])=>{
+    const s=document.createElement('div');s.className='csw';s.style.background=hex;s.dataset.ck=k;s.title=k;
+    s.addEventListener('click',()=>{c.querySelectorAll('.csw').forEach(x=>x.classList.remove('sel'));s.classList.add('sel');onClick(k,hex);});
+    c.appendChild(s);
+  });
+}
+
+let mSelSyms=[];
+function mBuildSymGrid(setKey){
+  const g=document.getElementById('mSymGrid');if(!g)return;g.innerHTML='';
+  (SYM_SETS[setKey]||[]).forEach(s=>{
+    const d=document.createElement('div');d.className='msym';d.textContent=s;
+    d.addEventListener('click',()=>{if(mSelSyms.includes(s)){mSelSyms=mSelSyms.filter(x=>x!==s);d.classList.remove('sel');}else{mSelSyms.push(s);d.classList.add('sel');}const el=document.getElementById('mSelSyms');if(el)el.textContent=mSelSyms.join('');});
+    g.appendChild(d);
+  });
+}
+function mClearSyms(){mSelSyms=[];const g=document.getElementById('mSelSyms');if(g)g.textContent='';document.querySelectorAll('.msym').forEach(x=>x.classList.remove('sel'));}
+function mApplySyms(){S.symbols=[...mSelSyms];if(!S.anim)render();}
+
+function mGenerateSigil(){
+  const intent=document.getElementById('mSigilIntent')?.value.trim();
+  if(!intent){S.sigil.letters=[];if(!S.anim)render();return;}
+  S.sigil.intention=intent;
+  S.sigil.letters=sigilProcessLetters(intent,S.sigil.reduction);
+  const el=document.getElementById('mSigilLetters');
+  if(el)el.textContent=S.sigil.letters.length?'Letters: '+S.sigil.letters.join(' · '):'(none)';
+  if(S.sigil.syncPts&&S.sigil.letters.length>=3){S.pts=Math.min(16,Math.max(3,S.sigil.letters.length));}
   if(!S.anim)render();
 }
-const mpl=document.getElementById('mPresetList');
-PRESETS.forEach(p=>{
-  const b=document.createElement('button');b.className='pbtn';b.textContent=p.name;
-  b.addEventListener('click',()=>mApplyPreset(p));mpl.appendChild(b);
-});
+
+function mApplyPreset(p){
+  const ck=p.color;
+  Object.assign(S,{style:p.style,pts:p.pts,rings:p.rings,detail:p.detail,color:COLS[ck]||COLS.gold,glow2:GLOWS[ck]||GLOWS.gold,bg:p.bg,dual:!!p.dual});
+  if(p.tr0!==undefined)S.tr[0].text=p.tr0;if(p.tr1!==undefined)S.tr[1].text=p.tr1;if(p.tr2!==undefined)S.tr[2].text=p.tr2;
+  document.getElementById('styleSelect').value=S.style;
+  if(!S.anim)render();
+}
+
 let mUserPresets=[];
 function mSavePreset(){
-  const name=document.getElementById('mPresetName').value.trim();if(!name)return;
-  const snap=JSON.parse(JSON.stringify(S));snap.name=name;mUserPresets.push(snap);mRenderUserPresets();document.getElementById('mPresetName').value='';
+  const name=document.getElementById('mPresetName')?.value.trim();if(!name)return;
+  const snap=JSON.parse(JSON.stringify(S));snap.name=name;mUserPresets.push(snap);renderUserPresets();
+  const el=document.getElementById('mPresetName');if(el)el.value='';
 }
-function mRenderUserPresets(){
-  const c=document.getElementById('mUserPresets');c.innerHTML='';
+function renderUserPresets(){
+  const c=document.getElementById('mUserPresets');if(!c)return;c.innerHTML='';
   mUserPresets.forEach(p=>{const b=document.createElement('button');b.className='pbtn';b.textContent=p.name;b.addEventListener('click',()=>{Object.assign(S,JSON.parse(JSON.stringify(p)));if(!S.anim)render();});c.appendChild(b);});
 }
+
+// ── Top bar controls ──
+document.getElementById('styleSelect').addEventListener('change',e=>{S.style=e.target.value;if(!S.anim)render();});
+document.getElementById('mAnimBtn').addEventListener('click',()=>{
+  S.anim=!S.anim;const btn=document.getElementById('mAnimBtn');
+  btn.textContent=S.anim?'⏹':'▶';btn.classList.toggle('on',S.anim);
+  if(S.anim)animate();else{stopAnim();render();}
+});
+document.getElementById('mRandBtn').addEventListener('click',()=>{
+  const styles=['star','orbital','alchemic','pentagram','mandala','celtic','sigil','rose','enochian','sacred','compass','labyrinth','zodiac','fractal','gothic','norse','chaos'];
+  const colKeys=Object.keys(COLS);
+  S.style=styles[Math.floor(Math.random()*styles.length)];
+  S.pts=3+Math.floor(Math.random()*14);S.rings=1+Math.floor(Math.random()*7);S.detail=1+Math.floor(Math.random()*5);
+  const ck=colKeys[Math.floor(Math.random()*colKeys.length)];S.color=COLS[ck];S.glow2=GLOWS[ck];
+  document.getElementById('styleSelect').value=S.style;
+  if(!S.anim)render();
+});
+
+// FABs
+document.getElementById('fabPulse').addEventListener('click',()=>{S.pulse=!S.pulse;document.getElementById('fabPulse').classList.toggle('on',S.pulse);if(S.pulse&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}else if(!S.anim)render();});
+document.getElementById('fabDual').addEventListener('click',()=>{S.dual=!S.dual;document.getElementById('fabDual').classList.toggle('on',S.dual);if(!S.anim)render();});
+document.getElementById('fabMirror').addEventListener('click',()=>{S.mirror=!S.mirror;document.getElementById('fabMirror').classList.toggle('on',S.mirror);if(!S.anim)render();});
+document.getElementById('fabSparks').addEventListener('click',()=>{S.sparks=!S.sparks;document.getElementById('fabSparks').classList.toggle('on',S.sparks);if(S.sparks&&!S.anim){S.anim=true;document.getElementById('mAnimBtn').textContent='⏹';document.getElementById('mAnimBtn').classList.add('on');animate();}if(!S.sparks)sparks=[];});
 
 // ── Init ──
 resize();
